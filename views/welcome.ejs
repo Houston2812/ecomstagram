@@ -16,14 +16,6 @@
 					<a href="">Start today and grow your business</a>
 					
 					<a href="" class="logo">World`s number one e-commerce platform</a>
-					<!--
-					<nav id="nav">
-						<a href="index.html">Home</a>
-						<a href="generic.html">Generic</a>
-						<a href="elements.html">Elements</a>
-					</nav>
-					<a href="#navPanel" class="navPanelToggle"><span class="fa fa-bars"></span></a>
-				-->
 				</div>
 			</header>
 
@@ -93,6 +85,11 @@
 							<footer>
 								<a href="/login" class="button">User account </a><br><br>
 								<a href="/login" class="button">Business account </a>
+								<% if (locals.username) { %>
+
+									<div style="margin-top: 25px; color: red;">You are logged in. </div>
+					
+								<% } %>
 							</footer>
 						</article>
 					</div>
@@ -116,11 +113,5 @@
 				<!-- </div> -->
 			</footer>
 
-		<!-- Scripts 
-			<script src="../public/assets/js/jquery.min.js"></script>
-			<script src="../public/assets/js/skel.min.js"></script>
-			<script src="../public/assets/js/util.js"></script>
-			<script src="../public/assets/js/main.js"></script>
-		-->
 	</body>
 </html>
