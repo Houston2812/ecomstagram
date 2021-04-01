@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+        <style>
+            body{width:50%;margin: 0 auto;}
+            .my-col{
+                color: white;
+                min-height: 150px;
+                text-align: center;
+                padding-top: 40px;
+                margin: 10px;
+            }
+            .pic{
+                float: left;
+                margin-right: 25px;
+                margin-top: 20px;
+            }
+
+        </style>
+
+    </head>
+    <body>
+        <div class="container">
+
+            <div class="content-section">
+                <div class="media ">
+                    <img class="rounded-circle account-img pic" width="150" height="150" src="/public/profile_pics/<%= user.profile_picture %>" >
+                    <div class="media-body pic">
+                        <p class="text-secondary"><b><%= user.username  %></b></p>
+                        <p><%= user.firstname %> <%= user.lastname %></p>
+                        <p><%= user.profile_description  %></p>
+                        <p>Contact:</p>
+                        <p><%= user.email_add %></p>
+                        <p><%= user.mobile_number %></p>
+
+                    </div>
+                    <div class="mb-3 pic">
+                        <a href='/users/edit/<%= user.id %>'>
+                            <button type="button" class="btn btn-primary btn-sm">Edit</button>
+                        </a>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </body>
+</html>

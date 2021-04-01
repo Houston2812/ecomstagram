@@ -5,6 +5,10 @@ const bodyParser = require('body-parser')
 const bcrypt = require('bcrypt')
 const { query } = require('express')
 
+const fileUpload = require('express-fileupload');
+const fs = require('fs');
+const path = require('path');
+
 var app = express()
 var port = 3000
 app.set('view engine', 'ejs')
@@ -20,11 +24,17 @@ app.use(session({
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
 
+app.use(fileUpload({
+    useTempFiles : true,
+    tempFileDir : path.join(__dirname,'tmp'),
+}));
+// app.use(fileUpload());
+
 var conn = mysql.createConnection({
-    host: 'CHANGE_IT',
-    user: 'CHANGE_IT',
+    host: 'localhost',
+    user: 'root',
     password: 'CHANGE_IT',
-    database: 'CHANGE_IT'
+    database: 'ecomstagram'
 })
 
 app.get(['/', '/home'], (req, res) => {
@@ -101,16 +111,139 @@ app.post('/login', (req, res) => {
                 req.session.is_logged = true;
                 req.session.username = result[0].username;
                 console.log(username);
-                res.redirect('/')
+                res.redirect('/users/' + result[0].id)
             }
             else {
                 req.session.is_logged = false;
                 req.session.username = '';
-                res.render('/login', {is_logged: req.session.is_logged})
+                res.render('login', {is_logged: req.session.is_logged})
             }
         }
     })
 })
+
+
+app.get('/users/:user_id', (req, res) => {
+    const user_id = req.params.user_id;
+
+    let find_user = `SELECT * FROM users WHERE id = "${user_id}";`
+    conn.query(find_user, (err, result) => {
+        if (err) throw err;
+        else{
+            console.log(result);
+            res.render('userProfile', {user:result[0]});
+        }
+    })
+
+});
+
+
+app.get('/users/edit/:user_id', (req, res) => {
+    const user_id = req.params.user_id;
+
+    let find_user = `SELECT * FROM users WHERE id = "${user_id}";`
+    conn.query(find_user, (err, result) => {
+        if (err) throw err;
+        else{
+            // console.log(result);
+            res.render('userProfileEdit', {user:result[0]});
+        }
+    })
+
+});
+
+app.post('/users/edit/:user_id', (req, res) => {
+    const user_id = req.params.user_id;
+    const {username, firstname, lastname, profile_description, date_of_birth, email_add, mobile_number} = req.body;
+
+    conn.query('UPDATE `users` SET username=?, firstname=?, lastname=?, profile_description=?, date_of_birth=?, email_add=?, mobile_number=? WHERE id = ?',
+    [username, firstname, lastname, profile_description ,date_of_birth, email_add, mobile_number, user_id], (err, result) => {
+        if (err) throw err;
+        else{
+            // console.log(result);
+            res.redirect("/users/" + user_id)
+        }
+    })
+});
+
+app.post('/users/edit_picture/:user_id', (req, res) => {
+    const user_id = req.params.user_id;
+    
+    if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).send('No files were uploaded.');
+    }
+
+    let targetFile = req.files.target_file;
+    let extName = path.extname(targetFile.name);
+    let baseName = path.basename(targetFile.name, extName);
+    let updatedName = targetFile.tempFilePath.substr(-13, 13) + extName;
+    let uploadDir = path.join(__dirname, 'public/profile_pics', updatedName);
+    console.log(targetFile);
+
+    let imgList = ['.png','.jpg','.jpeg'];
+
+    if(!imgList.includes(extName)){
+        fs.unlinkSync(targetFile.tempFilePath);
+        return res.send("Invalid Image");
+        //return res.status(422).send("Invalid Image");
+    }
+
+    if(targetFile.size > 1048576){
+        fs.unlinkSync(targetFile.tempFilePath);
+        return res.send("File is too Large");
+        //return res.status(413).send("File is too Large");
+    }
+
+    let find_user = `SELECT * FROM users WHERE id = "${user_id}";`
+    conn.query(find_user, (err, result) => {
+        if (err) throw err;
+        else{
+            let previous_pic = result[0].profile_picture;
+            let previous_pic_path = path.join(__dirname, 'public/profile_pics', previous_pic);
+
+            if(previous_pic !== "default.jpg"){
+                fs.unlinkSync(previous_pic_path);
+            }
+            conn.query('UPDATE `users` SET profile_picture=? WHERE id = ?',[updatedName, user_id], (err, result) => {
+                if (err) throw err;
+            })
+        }
+    })
+    
+    targetFile.mv(uploadDir, (err) => {
+        if (err)
+            return res.status(500).send(err);
+        res.redirect("/users/edit/" + user_id)
+    });
+
+  
+});
+
+app.post('/users/remove_picture/:user_id', (req, res) => {
+    const user_id = req.params.user_id;
+    
+    
+    let find_user = `SELECT * FROM users WHERE id = "${user_id}";`
+    conn.query(find_user, (err, result) => {
+        if (err) throw err;
+        else{
+            let curr_pic = result[0].profile_picture;
+            if(curr_pic !== "default.jpg"){
+                let curr_pic_path = path.join(__dirname, 'public/profile_pics', curr_pic);
+                fs.unlinkSync(curr_pic_path);
+                
+                conn.query('UPDATE `users` SET profile_picture="default.jpg" WHERE id = ?',[user_id], (err, result) => {
+                    if (err) throw err;
+                })  
+            }
+            res.redirect("/users/edit/" + user_id);
+        }
+    })
+    
+
+});
+
+
 app.listen(port, () => {
     console.log(`Server started at http://localhost:${port}`)
 })
