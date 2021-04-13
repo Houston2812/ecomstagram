@@ -13,7 +13,9 @@
         </style>
     </head>
     <body>
-        <form action="/users/edit_picture/<%= user.id %>" method="POST" enctype="multipart/form-data">
+        <!-- <form action="/users/edit_picture/<%= user.id %>" method="POST" enctype="multipart/form-data"> -->
+        <form action="/users/edit_picture/" method="POST" enctype="multipart/form-data">
+            
             <div class="mb-3">
                 <img class="rounded-circle account-img pic" width="150" height="150" 
                 src="/public/profile_pics/<%= user.profile_picture %>" >
@@ -23,7 +25,8 @@
                 <input type="submit" class="btn btn-info" value="Upload">
             </div>
         </form>
-        <form action="/users/remove_picture/<%= user.id %>" method="POST" enctype="multipart/form-data">
+        <!-- <form action="/users/remove_picture/<%= user.id %>" method="POST" enctype="multipart/form-data"> -->
+        <form action="/users/remove_picture/" method="POST" enctype="multipart/form-data">
             <input type="submit" class="btn btn-info" value="Remove Existing">
         </form>
         <form action="" method="POST" enctype="multipart/form-data">

@@ -16,4 +16,13 @@ CREATE TABLE users(
     profile_picture VARCHAR(255) DEFAULT "default.jpg"
 );
 
--- SELECT * from users;
+CREATE TABLE posts(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    pic_name VARCHAR(255),
+    profile_id INT NOT NULL,
+    likes INT DEFAULT 0,
+    price INT NOT NULL,
+    description VARCHAR(255), 
+    FOREIGN KEY (profile_id) REFERENCES users(id)
+);
+
