@@ -46,6 +46,9 @@
                             <a href="/users/new_post">
                                 <button type="button" class="btn btn-primary btn-sm">Add new product</button>
                             </a>
+                            <a href="/users/basket/">
+                                <button type="button" class="btn btn-primary btn-sm">Basket</button>
+                            </a>
                     </div>
                     <% products.forEach( product => { %>
                         <div class="card" style="width: 18rem;">
@@ -53,8 +56,15 @@
                             <div class="card-body">
                             <h5 class="card-title">Price <%= product.price %>$</h5>
                             <p class="card-text"><%= product.description %></p>
-                            <a href="#" class="btn btn-primary">Like</a>
-                            <a href="#" class="btn btn-primary">Buy</a>
+                            <p>Likes: <%= product.likes %></p>
+
+                            <form action="/users/like/<%= product.id %>" method="POST" enctype="multipart/form-data">
+                                <input type="submit" class="btn btn-primary" value="Like">
+                            </form>
+
+                            <form action="/users/buy/<%= product.id %>" method="POST" enctype="multipart/form-data">
+                                <input type="submit" class="btn btn-primary" value="Buy">
+                            </form>
                             </div>
                         </div>
                     <% }) %>
