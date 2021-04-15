@@ -110,6 +110,7 @@ app.post('/login', (req, res) => {
             if (compare) {
                 req.session.is_logged = true;
                 req.session.username = result[0].username;
+                req.session.basket = [];
                 console.log(username);
                 // res.redirect('/users/' + result[0].id)
                 res.redirect('/users/')
@@ -128,19 +129,6 @@ app.get('/error', (req, res) => {
     res.render('error')
 })
 
-// app.get('/users/:user_id', (req, res) => {
-//     const user_id = req.params.user_id;
-
-//     let find_user = `SELECT * FROM users WHERE id = "${user_id}";`
-//     conn.query(find_user, (err, result) => {
-//         if (err) throw err;
-//         else{
-//             console.log(result);
-//             res.render('userProfile', {user:result[0]});
-//         }
-//     })
-
-// });
 
 app.get('/users', (req, res) => {
 
@@ -169,20 +157,6 @@ app.get('/users', (req, res) => {
 });
 
 
-// app.get('/users/edit/:user_id', (req, res) => {
-//     const user_id = req.params.user_id;
-
-//     let find_user = `SELECT * FROM users WHERE id = "${user_id}";`
-//     conn.query(find_user, (err, result) => {
-//         if (err) throw err;
-//         else{
-//             // console.log(result);
-//             res.render('userProfileEdit', {user:result[0]});
-//         }
-//     })
-
-// });
-
 app.get('/users/edit/', (req, res) => {
     
     if (req.session.username) {
@@ -200,19 +174,6 @@ app.get('/users/edit/', (req, res) => {
 
 });
 
-// app.post('/users/edit/:user_id', (req, res) => {
-//     const user_id = req.params.user_id;
-//     const {username, firstname, lastname, profile_description, date_of_birth, email_add, mobile_number} = req.body;
-
-//     conn.query('UPDATE `users` SET username=?, firstname=?, lastname=?, profile_description=?, date_of_birth=?, email_add=?, mobile_number=? WHERE id = ?',
-//     [username, firstname, lastname, profile_description ,date_of_birth, email_add, mobile_number, user_id], (err, result) => {
-//         if (err) throw err;
-//         else{
-//             // console.log(result);
-//             res.redirect("/users/" + user_id)
-//         }
-//     })
-// });
 
 app.post('/users/edit/', (req, res) => {
     if (req.session.username) {
@@ -232,59 +193,6 @@ app.post('/users/edit/', (req, res) => {
     }
 });
 
-
-// app.post('/users/edit_picture/:user_id', (req, res) => {
-//     const user_id = req.params.user_id;
-    
-//     if (!req.files || Object.keys(req.files).length === 0) {
-//         return res.status(400).send('No files were uploaded.');
-//     }
-
-//     let targetFile = req.files.target_file;
-//     let extName = path.extname(targetFile.name);
-//     let baseName = path.basename(targetFile.name, extName);
-//     let updatedName = targetFile.tempFilePath.substr(-13, 13) + extName;
-//     let uploadDir = path.join(__dirname, 'public/profile_pics', updatedName);
-//     console.log(targetFile);
-
-//     let imgList = ['.png','.jpg','.jpeg'];
-
-//     if(!imgList.includes(extName)){
-//         fs.unlinkSync(targetFile.tempFilePath);
-//         return res.send("Invalid Image");
-//         //return res.status(422).send("Invalid Image");
-//     }
-
-//     if(targetFile.size > 1048576){
-//         fs.unlinkSync(targetFile.tempFilePath);
-//         return res.send("File is too Large");
-//         //return res.status(413).send("File is too Large");
-//     }
-
-//     let find_user = `SELECT * FROM users WHERE id = "${user_id}";`
-//     conn.query(find_user, (err, result) => {
-//         if (err) throw err;
-//         else{
-//             let previous_pic = result[0].profile_picture;
-//             let previous_pic_path = path.join(__dirname, 'public/profile_pics', previous_pic);
-
-//             if(previous_pic !== "default.jpg"){
-//                 fs.unlinkSync(previous_pic_path);
-//             }
-//             conn.query('UPDATE `users` SET profile_picture=? WHERE id = ?',[updatedName, user_id], (err, result) => {
-//                 if (err) throw err;
-//             })
-//         }
-//     })
-    
-//     targetFile.mv(uploadDir, (err) => {
-//         if (err)
-//             return res.status(500).send(err);
-//         res.redirect("/users/edit/" + user_id)
-//     });
-
-  
-// });
 
 app.post('/users/edit_picture/', (req, res) => {
     if (req.session.username) {
@@ -340,29 +248,6 @@ app.post('/users/edit_picture/', (req, res) => {
     }
 });
 
-// app.post('/users/remove_picture/:user_id', (req, res) => {
-//     const user_id = req.params.user_id;
-    
-    
-//     let find_user = `SELECT * FROM users WHERE id = "${user_id}";`
-//     conn.query(find_user, (err, result) => {
-//         if (err) throw err;
-//         else{
-//             let curr_pic = result[0].profile_picture;
-//             if(curr_pic !== "default.jpg"){
-//                 let curr_pic_path = path.join(__dirname, 'public/profile_pics', curr_pic);
-//                 fs.unlinkSync(curr_pic_path);
-                
-//                 conn.query('UPDATE `users` SET profile_picture="default.jpg" WHERE id = ?',[user_id], (err, result) => {
-//                     if (err) throw err;
-//                 })  
-//             }
-//             res.redirect("/users/edit/" + user_id);
-//         }
-//     })
-    
-
-// });
 
 app.post('/users/remove_picture/', (req, res) => {
     
@@ -395,7 +280,7 @@ app.get('/users/new_post/', (req, res) => {
         conn.query(find_user, (err, result) => {
             if (err) throw err;
             else{
-                console.log(result);
+                //console.log(result);
                 res.render('new_post',  {user:result[0]})
             }
         })
@@ -420,7 +305,7 @@ app.post('/users/new_post/', (req, res) => {
         
         uploadDir = path.join(uploadDir, targetFile.name)
         
-        console.log(`Price: ${price}\nDescription: ${description}`)
+        //console.log(`Price: ${price}\nDescription: ${description}`)
 
         let imgExtList = ['.png', '.jpg', '.jpeg', '.gif']
         if (!imgExtList.includes(extName)){
@@ -433,7 +318,7 @@ app.post('/users/new_post/', (req, res) => {
                 return res.send(err)
             conn.query(`SELECT id FROM users where username = "${req.session.username}";`, (err, resl)=> {
                 if (err) throw err;
-                console.log(resl);
+                //console.log(resl);
                 let sql = `INSERT INTO posts(pic_name, profile_id, price, description) VALUES ("${baseName}", ${resl[0].id}, ${price}, "${description}");` 
                 conn.query(sql, (err, result) => {
                     if (err) throw err;
@@ -447,6 +332,77 @@ app.post('/users/new_post/', (req, res) => {
     } else 
         res.redirect('/error')
 })
+
+
+app.post('/users/like/:post_id', (req, res) => {
+    if (req.session.username){
+        const post_id = parseInt(req.params.post_id, 10);
+        let prev_like;
+        conn.query('SELECT likes FROM posts WHERE id = ?',[post_id] ,(err, result) => {
+            if (err) throw err;
+            else{
+                prev_like = result[0].likes;
+                let new_like = prev_like + 1;
+                
+                conn.query('UPDATE `posts` SET likes=? WHERE id = ?',
+                [new_like, post_id] ,(err, result) => {
+                    if (err) throw err;
+                    else{
+                        //console.log(result);
+                        res.redirect('back');
+                    }
+                })
+            }
+        })
+    }
+    else    
+        res.redirect('/error')
+})
+
+
+
+app.post('/users/buy/:post_id', (req, res) => {
+    if (req.session.username){
+        conn.query('SELECT * FROM posts WHERE id = ?',[req.params.post_id] ,(err, result) => {
+            if (err) throw err;
+            else{
+                const product = JSON.parse(JSON.stringify(result))[0]
+                req.session.basket.push(product);
+                console.log(req.session.basket)
+                
+                res.redirect('back');
+            }
+        })
+    }
+    else    
+        res.redirect('/error')
+
+})
+
+
+app.get('/users/basket/', (req, res) => {
+    if (req.session.username){
+        
+        res.render('basket',  {basket:req.session.basket})
+    }
+    else    
+        res.redirect('/error')
+})
+
+
+app.post('/users/basket/delete/:index', (req, res) => {
+    if (req.session.username){
+        req.session.basket.splice(req.params.index, 1);
+        //console.log(req.session.basket)
+
+        res.redirect('back');
+    }
+    else    
+        res.redirect('/error')
+})
+
+
+
 
 app.listen(port, () => {
     console.log(`Server started at http://localhost:${port}`)
