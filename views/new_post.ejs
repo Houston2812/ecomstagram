@@ -1,32 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post new picture</title>
-</head>
-<body>
-    <form action="/users/new_post" method="POST" enctype="multipart/form-data">
-        <fieldset>
-            <legend>Add new product to the store</legend>
-            <input type="text" name="price" id="price" placeholder="Price of the product"> 
-            <br>
-            <input type="text" name="description" id="description" placeholder="Description of the product">
-            <br>
-            <label>Image of the product</label>
-            <br>
-            <input type="file" name="file_input" id="file_input" style="margin-left: 10px;">
-            <br>
-            <label for="file_input" class="button">Upload file...</label>
-            <br>
-            <input type="submit" class="button primary">
-
-        </fieldset>
-
-    </form>
-    <a href="/users/">
-        <button type="button">Return to the user profile</button>
-    </a>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Add Product - Dashboard HTML Template</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:400,700"
+    />
+    <link rel="stylesheet" href="../public/css/fontawesome.min.css" />
+    <link rel="stylesheet" href="../public/jquery-ui-datepicker/jquery-ui.min.css" type="text/css" />
+    <link rel="stylesheet" href="../public/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../public/css/addproduct.css">
+  </head>
+  <body>
+    <div class="container tm-mt-big tm-mb-big">
+      <div class="row">
+        <div class="col-xl-9 col-lg-10 col-md-12 col-sm-12 mx-auto">
+          <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+            <div class="row">
+              <div class="col-12">
+                <h2 class="tm-block-title d-inline-block">Add Product</h2>
+              </div>
+            </div>
+            <div class="row tm-edit-product-row">
+              <div class="col-xl-6 col-lg-6 col-md-12">
+                <form action="/users/new_post" method="POST" enctype="multipart/form-data" class="tm-edit-product-form">
+                  <div class="form-group mb-3">
+                    <label
+                      for="product"
+                      >Product Name
+                    </label>
+                    <input
+                      id="product"
+                      name="product"
+                      type="text"
+                      class="form-control validate input-color"
+                      required
+                    />
+                  </div>
+                  <div class="form-group mb-3">
+                    <label
+                      for="price"
+                      >Price
+                    </label>
+                    <input
+                      id="price"
+                      name="price"
+                      type="text"
+                      class="form-control validate input-color"
+                      required
+                    />
+                  </div>
+                  <div class="form-group mb-3">
+                    <label
+                      for="description"
+                      >Description</label
+                    >
+                    <textarea
+                    id="description"
+                    name="description"
+                      class="form-control validate input-color"
+                      rows="3"
+                      required
+                    ></textarea>
+                  </div>                  
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-12 mx-auto mb-4">
+                <div class="tm-product-img-dummy mx-auto">
+                  <i
+                    class="fas fa-cloud-upload-alt tm-upload-icon"
+                    onclick="document.getElementById('file_input').click();"
+                  ></i>
+                </div>
+                <div class="custom-file mt-3 mb-3">
+                  <input id="file_input" name="file_input" type="file" style="display:none;" />
+                  <input
+                    type="button"
+                    class="btn btn-primary btn-block mx-auto"
+                    value="UPLOAD PRODUCT IMAGE"
+                    onclick="document.getElementById('file_input').click();"
+                  />
+                </div>
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-primary btn-block text-uppercase">Add Product Now</button>
+                <a class="btn btn-primary btn-block text-uppercase" href="/users/">Return Profile</a>
+              </div>
+            </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="../public/js/jquery-3.3.1.min.js"></script>
+    <script src="../public/jquery-ui-datepicker/jquery-ui.min.js"></script>
+    <script src="../public/js/bootstrap.min.js"></script>
+  </body>
 </html>
