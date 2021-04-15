@@ -34,7 +34,7 @@ app.use(fileUpload({
 var conn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'password',
+    password: 'CHANGE_IT',
     database: 'ecomstagram'
 })
 
