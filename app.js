@@ -34,7 +34,7 @@ app.use(fileUpload({
 var conn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'CHANGE_IT',
+    password: 'password',
     database: 'ecomstagram'
 })
 
@@ -118,8 +118,10 @@ app.post('/login', (req, res) => {
             else {
                 req.session.is_logged = false;
                 req.session.username = '';
-                res.render('login', {is_logged: req.session.is_logged})
+                res.redirect('/login')
             }
+        } else {
+            res.redirect('/login')
         }
     })
 })
