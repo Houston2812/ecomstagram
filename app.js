@@ -34,7 +34,7 @@ app.use(fileUpload({
 var conn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'CHANGE_IT',
+    password: 'password',
     database: 'ecomstagram'
 })
 
@@ -127,6 +127,15 @@ app.post('/login', (req, res) => {
     })
 })
 
+app.get('/logout', (req, res)=>{
+    if (req.session.username){
+        req.session.destroy()
+        res.redirect('/home')
+    } else {
+        res.redirect('/error')
+    }
+})
+
 app.get('/error', (req, res) => {
     res.render('error')
 })
@@ -143,10 +152,10 @@ app.get('/users', (req, res) => {
                     else {
                         if (res2.length > 0){
                             console.log(res2)
-                            res.render('userProfile', {user: res1[0], products: res2})
+                            res.render('userProfile_upd', {user: res1[0], products: res2})
                         }
                         else{
-                            res.render('userProfile', {user:res1[0], products: []})
+                            res.render('userProfile_upd', {user:res1[0], products: []})
                         }
                     }
                 })
@@ -167,7 +176,7 @@ app.get('/users/edit/', (req, res) => {
             if (err) throw err;
             else{
                 // console.log(result);
-                res.render('userProfileEdit', {user:result[0]});
+                res.render('userProfileEdit_upd', {user:result[0]});
             }
         })    
     } else {

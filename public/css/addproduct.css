@@ -357,4 +357,8 @@ input[type="checkbox"]:focus {
 
 .input-color {
   background-color: #fff;
+  color: 	#808080;
 }
+/* input:hover, input:focus{
+  bac
+} */
