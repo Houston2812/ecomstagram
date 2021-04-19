@@ -26,3 +26,10 @@ CREATE TABLE posts(
     FOREIGN KEY (profile_id) REFERENCES users(id)
 );
 
+
+
+ALTER TABLE users
+ADD status BOOLEAN DEFAULT 0;
+
+ALTER TABLE users
+ADD confirmationCode VARCHAR(255) NOT NULL UNIQUE;

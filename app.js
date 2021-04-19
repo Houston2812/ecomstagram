@@ -9,18 +9,21 @@ const fileUpload = require('express-fileupload');
 const fs = require('fs');
 const path = require('path');
 const { dir } = require('console')
+var flash = require('connect-flash')
+var { body, check, validationResult, custom} =  require('express-validator')
+var cookieParser = require('cookie-parser')
+var sign = require('jwt-encode')
+const nodemailer = require('nodemailer')
+const config = require('./config')
 
 var app = express()
 var port = 3000
+const user = config.user
+const pass = config.pass 
+
 app.set('view engine', 'ejs')
 app.use('/public',express.static('public'));
 
-
-app.use(session({
-    secret: "fgjdsgsjdlgdsjglsgd",
-    resave: false, 
-    saveUninitialized: false
-}))
 
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
@@ -29,73 +32,214 @@ app.use(fileUpload({
     useTempFiles : true,
     tempFileDir : path.join(__dirname,'tmp'),
 }));
+// app.use(expressValidator())
 // app.use(fileUpload());
+
+app.use(cookieParser(config.sessionSecret))
+app.use(session({
+    secret: config.sessionSecret,
+    resave: false, 
+    saveUninitialized: false,
+    cookie: { maxAge: 60000 }
+}))
+app.use(flash())
 
 var conn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'password',
+    password: config.db_pass,
     database: 'ecomstagram'
 })
+
+const transport = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: user,
+        pass: pass,
+    }
+})
+
+var sendConfirmationEmail = (name, email, confirmationCode) => {
+    console.log(name, email, confirmationCode )
+    transport.sendMail({
+        from: user,
+        to: email,
+        subject: 'Please confirm your account',
+        html: `
+            <h1> Email Confirmation </h1>
+            <h2> Hello ${name} </h2>
+            <p> Thank you for creating an account on E-comstagram. Please activate your account by clicking at following link</p>
+            <a href=http://localhost:${port}/confirm/${confirmationCode}> Click here </a>
+            `
+    }).catch(err => console.log(err));
+}
 
 app.get(['/', '/home'], (req, res) => {
     res.render('welcome', {username: req.session.username})
 })
 
-app.get('/registration', (req, res) => {
-    res.render('registration', {username_taken: req.session.username_taken, passwords_match: req.session.passwords_match, email_used: req.session.email_used})
+app.get('/customer_registration', (req, res) => {
+    res.render('customer_registration')
+})
+
+app.get('/business_registration', (req, res) => {
+    res.render('business_registration')
 })
 
 app.get('/login', (req, res)=> {
+    if (!req.session.isActivated) {
+        req.flash('success', 'User registered successfully! Please activate your account through confirmation mail.')
+        res.locals.message = req.flash()
+        req.session.isActivated = true;
+    }
     res.render('login',  {is_logged: req.session.is_logged})
 })
 
-app.post('/registration', (req, res) => {
-    const {username, passw, passw_rep, firstname, lastname, date_of_birth, email_add, mobile_number} = req.body;
-    
+// password should contain at least one lowercase letter, one uppercase letter,
+// one numeric digit and one special character and be 7-15 characters long 
+app.post(
+    '/customer_registration', 
+    check('username')
+        .matches(/^[A-Za-z]\w{7,14}$/)
+        .withMessage('Username must be at least 7 characters long and start with letter.'),
+    check('email_add')
+        .isEmail().withMessage('Email should be entered to this field')
+        .custom((value, {req}) => {
+            return new Promise((resolve, reject) => {
+                let email_query = `select * from users where email_add = "${req.body.email_add}";`
+                conn.query(email_query, (err, result) => {
+                    if (err) throw err
+                    if (result.length > 0) [
+                        reject(new Error('Email already in use'))
+                    ]
 
-    
-    console.log(username,  passw, passw_rep, firstname, lastname, date_of_birth, email_add, mobile_number);
-    let username_query = `select * from users where username = "${username}";`
-    let email_query = `select * from users where email_add = "${email_add}";`
-
-    
-    if (passw === passw_rep) {
-        req.session.passwords_match = true;
-        conn.query(username_query, (err, result) => {
-            if (err) throw err;
-            if (result.length > 0){
-                req.session.username_taken = true;
-                res.render('registration', {username_taken: req.session.username_taken, passwords_match: req.session.passwords_match, email_used: req.session.email_used})
-            }
-            else if (result.length == 0) {
-                req.session.username_taken = false;
-                conn.query(email_query, (err2, result2) => {
-                    if (err2) throw err2;
-                    if (result2.length > 0){
-                        req.session.email_used = true;
-                        res.render('registration', {username_taken: req.session.username_taken, passwords_match: req.session.passwords_match, email_used: req.session.email_used})
-                    } 
-                    else if (result.length == 0){
-                        req.session.email_used = false;
-                        bcrypt.hash(passw, 10, (err, encPass) => {
-                            if (err)
-                                throw err;
-                            let sql = `INSERT INTO users(firstname, lastname, date_of_birth, username, password, email_add, mobile_number) values ("${firstname}", "${lastname}", "${date_of_birth}", "${username}", "${encPass}", "${email_add}", "${mobile_number}");`
-                            conn.query(sql, (err3, result3) => {
-                                if (err3) throw(err3);
-                                res.redirect('/login')
-                            })
-                        })
-                    }
+                    resolve(true)
                 })
-            }
-           
-        })
-    } else {
-        req.session.passwords_match = false;
-        res.render('registration', {username_taken: req.session.username_taken, passwords_match: req.session.passwords_match, email_used: req.session.email_used})
-    }
+            })
+        }),
+    check('passw')
+        .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{7,15}$/)
+        .withMessage('Password must be at least 7 characters long and must contain digits, symbols, uppercase and lowercase letters.'),
+    body('passw_rep').custom((value, {req}) => {
+        console.log(req.body.passw, value)
+        if (value !== req.body.passw) {
+            throw new Error('Password confirmation does not match password')
+        }
+        return true
+    }),
+    check('mobile_number')
+        .matches(/^\+\(?([0-9]{3})\)?([0-9]{6,14})$/)
+        .withMessage('Mobile number must satisfy international phone number format.'),
+    (req, res) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            var error_msg = '';
+            errors.array().forEach(err => {
+                error_msg += err.msg + '<br>'
+            })
+            req.flash('error', error_msg)
+            res.locals.message = req.flash()
+            res.render('customer_registration')
+        } else {
+            const {username, passw, passw_rep, firstname, lastname, date_of_birth, email_add, mobile_number} = req.body;    
+            const token = sign({email: email_add}, config.secret)
+
+            bcrypt.hash(passw, 10, (err, encPass) => {
+                if (err)
+                    throw err;
+                let sql = `INSERT INTO users(firstname, lastname, date_of_birth, username, password, email_add, mobile_number, confirmationCode) values ("${firstname}", "${lastname}", "${date_of_birth}", "${username}", "${encPass}", "${email_add}", "${mobile_number}", "${token}");`
+                conn.query(sql, (err1, result) => {
+                    if (err1) throw(err1);
+                    req.session.isActivated = false;
+                    sendConfirmationEmail(username, email_add, token)
+                    res.redirect('/login')
+                })
+            })
+        }
+})
+
+app.post(
+    '/business_registration', 
+    check('username')
+        .matches(/^[A-Za-z]\w{7,14}$/)
+        .withMessage('Username must be at least 7 characters long and start with letter.'),
+    check('email_add')
+        .isEmail().withMessage('Email should be entered to this field')
+        .custom((value, { req }) => {
+            return new Promise((resolve, reject) => {
+                let email_query = `select * from users where email_add = "${req.body.email_add}";`
+                conn.query(email_query, (err, result) => {
+                    if (err) throw err
+                    if (result.length > 0) [
+                        reject(new Error('Email already in use'))
+                    ]
+
+                    resolve(true)
+                })
+            })
+        }),
+    check('passw')
+        .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{7,15}$/)
+        .withMessage('Password must be at least 7 characters long and must contain digits, symbols, uppercase and lowercase letters.'),
+    body('passw_rep').custom((value, { req }) => {
+        console.log(req.body.passw, value)
+        if (value !== req.body.passw) {
+            throw new Error('Password confirmation does not match password')
+        }
+        return true
+    }),
+    check('mobile_number')
+        .matches(/^\+\(?([0-9]{3})\)?([0-9]{6,14})$/)
+        .withMessage('Mobile number must satisfy international phone number format.'),
+    (req, res) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            var error_msg = '';
+            errors.array().forEach(err => {
+                error_msg += err.msg + '<br>'
+            })
+            req.flash('error', error_msg)
+            res.locals.message = req.flash()
+            res.render('business_registration')
+        } else {
+            const { username, passw, passw_rep, firstname, lastname, date_of_birth, email_add, mobile_number } = req.body;
+            const token = sign({email: email_add}, config.secret)
+
+            bcrypt.hash(passw, 10, (err, encPass) => {
+                if (err)
+                    throw err;
+                let sql = `INSERT INTO users(firstname, lastname, date_of_birth, username, password, specialization, email_add, mobile_number, confirmationCode) values ("${firstname}", "${lastname}", "${date_of_birth}", "${username}", "${encPass}", "business", "${email_add}",  "${mobile_number}", "${token}");`
+                conn.query(sql, (err1, result) => {
+                    if (err1) throw (err1);
+                    req.session.isActivated = false;
+                    sendConfirmationEmail(username, email_add, token)
+                    res.redirect('/login')
+                })
+            })
+        }
+})
+
+app.get('/confirm/:confirmationCode', (req, res) => {
+    console.log(req.params.confirmationCode)
+    let sql = `select * from users where confirmationCode = "${req.params.confirmationCode}";`
+    conn.query(sql, (err, result) => {
+        if (err) throw err;
+        if (result.length > 0) {    
+            let update_sql = `update users set status = 1 where confirmationCode = "${req.params.confirmationCode}";`
+            conn.query(update_sql, (err2, result2) => {
+                if (err2) throw err2;
+                res.locals.message = ''
+                if (req.session.username){
+                    res.redirect('/users')
+                } else {
+                    res.redirect('/login')
+                }
+            })
+        }
+        else {
+            res.redirect('/error')
+        }
+    })
 })
 
 app.post('/login', (req, res) => {
@@ -106,20 +250,26 @@ app.post('/login', (req, res) => {
         console.log(result);
 
         if (result.length > 0) {
-            let compare = bcrypt.compareSync(passw, result[0].password)
-            if (compare) {
-                req.session.is_logged = true;
-                req.session.username = result[0].username;
-                req.session.basket = [];
-                console.log(username);
-                // res.redirect('/users/' + result[0].id)
-                res.redirect('/users/')
-
-            }
-            else {
-                req.session.is_logged = false;
-                req.session.username = '';
-                res.redirect('/login')
+            if (result[0].status != 1) {
+                req.flash('error', 'Pending account. Please verify your email');
+                res.locals.message = req.flash()
+                res.render('login')
+            } else {
+                let compare = bcrypt.compareSync(passw, result[0].password)
+                if (compare) {
+                    req.session.username = result[0].username;
+                    req.session.basket = [];
+                    console.log(username);
+                    // res.redirect('/users/' + result[0].id)
+                    res.redirect('/users/')
+    
+                }
+                else {
+                    req.flash('error', 'Wrong credentaials!');
+                    res.locals.message = req.flash()
+                    req.session.username = '';
+                    res.render('/login')
+                }
             }
         } else {
             res.redirect('/login')
@@ -411,8 +561,6 @@ app.post('/users/basket/delete/:index', (req, res) => {
     else    
         res.redirect('/error')
 })
-
-
 
 
 app.listen(port, () => {
