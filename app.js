@@ -15,9 +15,11 @@ var cookieParser = require('cookie-parser')
 var sign = require('jwt-encode')
 const nodemailer = require('nodemailer')
 const config = require('./config')
+const { Z_FILTERED } = require('zlib')
 
 var app = express()
 var port = 3000
+var hour = 3600000
 const user = config.user
 const pass = config.pass 
 
@@ -40,7 +42,7 @@ app.use(session({
     secret: config.sessionSecret,
     resave: false, 
     saveUninitialized: false,
-    cookie: { maxAge: 60000 }
+    cookie: { maxAge: 100*hour }
 }))
 app.use(flash())
 
@@ -75,6 +77,7 @@ var sendConfirmationEmail = (name, email, confirmationCode) => {
 }
 
 app.get(['/', '/home'], (req, res) => {
+    req.session.cookie.expires = new Date(Date.now() + hour)
     res.render('welcome', {username: req.session.username})
 })
 
@@ -87,10 +90,10 @@ app.get('/business_registration', (req, res) => {
 })
 
 app.get('/login', (req, res)=> {
-    if (!req.session.isActivated) {
+    if (req.session.isActivated == 'false') {
         req.flash('success', 'User registered successfully! Please activate your account through confirmation mail.')
         res.locals.message = req.flash()
-        req.session.isActivated = true;
+        req.session.isActivated = 'true';
     }
     res.render('login',  {is_logged: req.session.is_logged})
 })
@@ -150,7 +153,7 @@ app.post(
                 let sql = `INSERT INTO users(firstname, lastname, date_of_birth, username, password, email_add, mobile_number, confirmationCode) values ("${firstname}", "${lastname}", "${date_of_birth}", "${username}", "${encPass}", "${email_add}", "${mobile_number}", "${token}");`
                 conn.query(sql, (err1, result) => {
                     if (err1) throw(err1);
-                    req.session.isActivated = false;
+                    req.session.isActivated = "false";
                     sendConfirmationEmail(username, email_add, token)
                     res.redirect('/login')
                 })
@@ -211,7 +214,7 @@ app.post(
                 let sql = `INSERT INTO users(firstname, lastname, date_of_birth, username, password, specialization, email_add, mobile_number, confirmationCode) values ("${firstname}", "${lastname}", "${date_of_birth}", "${username}", "${encPass}", "business", "${email_add}",  "${mobile_number}", "${token}");`
                 conn.query(sql, (err1, result) => {
                     if (err1) throw (err1);
-                    req.session.isActivated = false;
+                    req.session.isActivated = "false";
                     sendConfirmationEmail(username, email_add, token)
                     res.redirect('/login')
                 })
@@ -268,7 +271,7 @@ app.post('/login', (req, res) => {
                     req.flash('error', 'Wrong credentaials!');
                     res.locals.message = req.flash()
                     req.session.username = '';
-                    res.render('/login')
+                    res.render('login')
                 }
             }
         } else {
@@ -294,6 +297,7 @@ app.get('/error', (req, res) => {
 app.get('/users', (req, res) => {
 
     if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
         conn.query(`SELECT * from users where username = "${req.session.username}";`, (err1, res1) => {
             if (err1) throw err1;
             else {
@@ -321,6 +325,7 @@ app.get('/users', (req, res) => {
 app.get('/users/edit/', (req, res) => {
     
     if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
         let find_user = `SELECT * FROM users WHERE username = "${req.session.username}";`
         conn.query(find_user, (err, result) => {
             if (err) throw err;
@@ -338,6 +343,8 @@ app.get('/users/edit/', (req, res) => {
 
 app.post('/users/edit/', (req, res) => {
     if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         const {username, firstname, lastname, profile_description, date_of_birth, email_add, mobile_number} = req.body;
 
         conn.query('UPDATE `users` SET username=?, firstname=?, lastname=?, profile_description=?, date_of_birth=?, email_add=?, mobile_number=? WHERE username = ?',
@@ -357,6 +364,7 @@ app.post('/users/edit/', (req, res) => {
 
 app.post('/users/edit_picture/', (req, res) => {
     if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
     
         if (!req.files || Object.keys(req.files).length === 0) {
             return res.status(400).send('No files were uploaded.');
@@ -413,6 +421,8 @@ app.post('/users/edit_picture/', (req, res) => {
 app.post('/users/remove_picture/', (req, res) => {
     
     if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         let find_user = `SELECT * FROM users WHERE username = "${req.session.username}";`
         conn.query(find_user, (err, result) => {
             if (err) throw err;
@@ -437,6 +447,8 @@ app.post('/users/remove_picture/', (req, res) => {
 
 app.get('/users/new_post/', (req, res) => {
     if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         let find_user = `SELECT * FROM users WHERE username = "${req.session.username}";`
         conn.query(find_user, (err, result) => {
             if (err) throw err;
@@ -453,6 +465,8 @@ app.get('/users/new_post/', (req, res) => {
 
 app.post('/users/new_post/', (req, res) => {
     if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         // let moment = req.timestamp
         let targetFile = req.files.file_input;
         let extName = path.extname(targetFile.name)
@@ -497,6 +511,8 @@ app.post('/users/new_post/', (req, res) => {
 
 app.post('/users/like/:post_id', (req, res) => {
     if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         const post_id = parseInt(req.params.post_id, 10);
         let prev_like;
         conn.query('SELECT likes FROM posts WHERE id = ?',[post_id] ,(err, result) => {
@@ -524,6 +540,8 @@ app.post('/users/like/:post_id', (req, res) => {
 
 app.post('/users/buy/:post_id', (req, res) => {
     if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         conn.query('SELECT * FROM posts WHERE id = ?',[req.params.post_id] ,(err, result) => {
             if (err) throw err;
             else{
@@ -543,6 +561,7 @@ app.post('/users/buy/:post_id', (req, res) => {
 
 app.get('/users/basket/', (req, res) => {
     if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
         
         res.render('basket',  {basket:req.session.basket})
     }
@@ -553,6 +572,8 @@ app.get('/users/basket/', (req, res) => {
 
 app.post('/users/basket/delete/:index', (req, res) => {
     if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         req.session.basket.splice(req.params.index, 1);
         //console.log(req.session.basket)
 
@@ -561,6 +582,30 @@ app.post('/users/basket/delete/:index', (req, res) => {
     else    
         res.redirect('/error')
 })
+
+app.get('/feed', (req, res) => {
+    if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
+        let sql = `SELECT posts.*, users.username, users.profile_picture FROM posts, users WHERE users.id = posts.profile_id AND users.username != "${req.session.username}";`
+
+        conn.query(sql, (err, result) => {
+            if (err) throw err;
+            if (result.length > 0){
+                console.log(result);
+                res.render('feed', {username: req.session.username, posts: result })
+            }
+        })
+
+
+
+        // res.render('feed', {username: req.session.username})
+    } else {
+        res.redirect('/error')
+    }
+})
+
 
 
 app.listen(port, () => {
