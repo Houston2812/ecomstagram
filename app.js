@@ -9,6 +9,23 @@ const fileUpload = require('express-fileupload');
 const fs = require('fs');
 const path = require('path');
 const { dir } = require('console')
+
+const config = require('./config')
+
+var MySQLStore = require('express-mysql-session')(session);
+var options = {
+	host: 'localhost',
+	port: 3306,
+	user: 'root',
+	password: config.db_pass,
+	database: 'ecomstagram'
+};
+var sessionStore = new MySQLStore(options);
+
+const PUBLISHABLE_KEY = config.publishable_key
+const SECRET_KEY = config.secret_key
+
+const stripe = require('stripe')(SECRET_KEY) 
 var flash = require('connect-flash')
 var { body, check, validationResult, custom} =  require('express-validator')
 var cookieParser = require('cookie-parser')
@@ -16,6 +33,7 @@ var sign = require('jwt-encode')
 const nodemailer = require('nodemailer')
 const config = require('./config')
 const { Z_FILTERED } = require('zlib')
+
 
 var app = express()
 var port = 3000
@@ -272,7 +290,7 @@ app.post('/login', (req, res) => {
                     res.locals.message = req.flash()
                     req.session.username = '';
                     res.render('login')
-                }
+
             }
         } else {
             res.redirect('/login')
@@ -306,10 +324,10 @@ app.get('/users', (req, res) => {
                     else {
                         if (res2.length > 0){
                             console.log(res2)
-                            res.render('userProfile_upd', {user: res1[0], products: res2})
+                            res.render('userProfile', {user: res1[0], products: res2})
                         }
                         else{
-                            res.render('userProfile_upd', {user:res1[0], products: []})
+                            res.render('userProfile', {user:res1[0], products: []})
                         }
                     }
                 })
@@ -546,9 +564,12 @@ app.post('/users/buy/:post_id', (req, res) => {
             if (err) throw err;
             else{
                 const product = JSON.parse(JSON.stringify(result))[0]
+                if(!req.session.basket){
+                    req.session.basket = []
+                }
                 req.session.basket.push(product);
                 console.log(req.session.basket)
-                
+
                 res.redirect('back');
             }
         })
@@ -588,8 +609,13 @@ app.post('/users/follow/:profile_id', (req, res) => {
 
 app.get('/users/basket/', (req, res) => {
     if (req.session.username){
+
+        if(!req.session.basket){
+            req.session.basket = []
+        }
+
         req.session.cookie.expires = new Date(Date.now() + hour)
-        
+
         res.render('basket',  {basket:req.session.basket})
     }
     else    
@@ -638,6 +664,62 @@ app.get('/feed', (req, res) => {
         res.redirect('/error')
     }
 })
+
+// app.post('/users/basket/purchase/', async (req, res) => {
+//     const calculateOrderAmount = items => {
+//         // Replace this constant with a calculation of the order's amount
+//         // Calculate the order total on the server to prevent
+//         // people from directly manipulating the amount on the client
+//         return 1400;
+//     };
+
+
+//     if (req.session.username){
+//         const { items } = req.body;
+//         // Create a PaymentIntent with the order amount and currency
+//         const paymentIntent = await stripe.paymentIntents.create({
+//           amount: calculateOrderAmount(items),
+//           currency: "usd"
+//         });
+//         res.send({
+//           clientSecret: paymentIntent.client_secret
+//         });
+        
+//     }
+//     else    
+//         res.redirect('/error')
+// })
+
+
+
+app.get('/users/basket/purchase/', (req, res) => {
+    if (req.session.username){
+        
+        res.render('payment',  {key:PUBLISHABLE_KEY})
+    }
+    else    
+        res.redirect('/error')
+})
+
+  
+app.post("/create-payment-intent", async (req, res) => {
+    let amount = 0; 
+    
+    (req.session.basket).forEach((item) => { amount += item.price * 100})
+
+    console.log(amount);
+    
+    const { items } = req.body;
+    // Create a PaymentIntent with the order amount and currency
+    const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd"
+    });
+
+    res.send({
+        clientSecret: paymentIntent.client_secret
+    });
+});
 
 
 
