@@ -9,6 +9,20 @@ const fileUpload = require('express-fileupload');
 const fs = require('fs');
 const path = require('path');
 const { dir } = require('console')
+var MySQLStore = require('express-mysql-session')(session);
+var options = {
+	host: 'localhost',
+	port: 3306,
+	user: 'root',
+	password: 'password',
+	database: 'ecomstagram'
+};
+var sessionStore = new MySQLStore(options);
+
+const PUBLISHABLE_KEY = "pk_test_51Ii0zJB0LNbpdNYLO62rSCK1csTbiR0jJvSOR3AQBBt71AqaB3s9vNVdkUS44qUD9uF0DCRWJ9jgZjJK7WobWgqn00L3lsU4Fz"
+const SECRET_KEY = "sk_test_51Ii0zJB0LNbpdNYLgHcIBTTIkTOGhurFRFPK8ROst50wOu7fxqPQjgaZcvjY63yG6RGpD2gbiFHoCyaAHi38eGIx00dP9MWPDj"
+
+const stripe = require('stripe')(SECRET_KEY) 
 
 var app = express()
 var port = 3000
@@ -17,6 +31,8 @@ app.use('/public',express.static('public'));
 
 
 app.use(session({
+    key: 'password',
+    store: sessionStore,
     secret: "fgjdsgsjdlgdsjglsgd",
     resave: false, 
     saveUninitialized: false
@@ -110,7 +126,7 @@ app.post('/login', (req, res) => {
             if (compare) {
                 req.session.is_logged = true;
                 req.session.username = result[0].username;
-                req.session.basket = [];
+                // req.session.basket = [];
                 console.log(username);
                 // res.redirect('/users/' + result[0].id)
                 res.redirect('/users/')
@@ -152,10 +168,10 @@ app.get('/users', (req, res) => {
                     else {
                         if (res2.length > 0){
                             console.log(res2)
-                            res.render('userProfile_upd', {user: res1[0], products: res2})
+                            res.render('userProfile', {user: res1[0], products: res2})
                         }
                         else{
-                            res.render('userProfile_upd', {user:res1[0], products: []})
+                            res.render('userProfile', {user:res1[0], products: []})
                         }
                     }
                 })
@@ -378,9 +394,12 @@ app.post('/users/buy/:post_id', (req, res) => {
             if (err) throw err;
             else{
                 const product = JSON.parse(JSON.stringify(result))[0]
+                if(!req.session.basket){
+                    req.session.basket = []
+                }
                 req.session.basket.push(product);
                 console.log(req.session.basket)
-                
+
                 res.redirect('back');
             }
         })
@@ -412,6 +431,62 @@ app.post('/users/basket/delete/:index', (req, res) => {
         res.redirect('/error')
 })
 
+
+// app.post('/users/basket/purchase/', async (req, res) => {
+//     const calculateOrderAmount = items => {
+//         // Replace this constant with a calculation of the order's amount
+//         // Calculate the order total on the server to prevent
+//         // people from directly manipulating the amount on the client
+//         return 1400;
+//     };
+
+
+//     if (req.session.username){
+//         const { items } = req.body;
+//         // Create a PaymentIntent with the order amount and currency
+//         const paymentIntent = await stripe.paymentIntents.create({
+//           amount: calculateOrderAmount(items),
+//           currency: "usd"
+//         });
+//         res.send({
+//           clientSecret: paymentIntent.client_secret
+//         });
+        
+//     }
+//     else    
+//         res.redirect('/error')
+// })
+
+
+
+app.get('/users/basket/purchase/', (req, res) => {
+    if (req.session.username){
+        
+        res.render('payment',  {key:PUBLISHABLE_KEY})
+    }
+    else    
+        res.redirect('/error')
+})
+
+  
+app.post("/create-payment-intent", async (req, res) => {
+    let amount = 0; 
+    
+    (req.session.basket).forEach((item) => { amount += item.price * 100})
+
+    console.log(amount);
+    
+    const { items } = req.body;
+    // Create a PaymentIntent with the order amount and currency
+    const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd"
+    });
+
+    res.send({
+        clientSecret: paymentIntent.client_secret
+    });
+});
 
 
 
