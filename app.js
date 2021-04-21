@@ -9,18 +9,20 @@ const fileUpload = require('express-fileupload');
 const fs = require('fs');
 const path = require('path');
 const { dir } = require('console')
+const config = require('./config')
+
 var MySQLStore = require('express-mysql-session')(session);
 var options = {
 	host: 'localhost',
 	port: 3306,
 	user: 'root',
-	password: 'password',
+	password: config.db_pass,
 	database: 'ecomstagram'
 };
 var sessionStore = new MySQLStore(options);
 
-const PUBLISHABLE_KEY = "pk_test_51Ii0zJB0LNbpdNYLO62rSCK1csTbiR0jJvSOR3AQBBt71AqaB3s9vNVdkUS44qUD9uF0DCRWJ9jgZjJK7WobWgqn00L3lsU4Fz"
-const SECRET_KEY = "sk_test_51Ii0zJB0LNbpdNYLgHcIBTTIkTOGhurFRFPK8ROst50wOu7fxqPQjgaZcvjY63yG6RGpD2gbiFHoCyaAHi38eGIx00dP9MWPDj"
+const PUBLISHABLE_KEY = config.publishable_key
+const SECRET_KEY = config.secret_key
 
 const stripe = require('stripe')(SECRET_KEY) 
 
@@ -31,9 +33,9 @@ app.use('/public',express.static('public'));
 
 
 app.use(session({
-    key: 'password',
+    key: config.db_pass,
     store: sessionStore,
-    secret: "fgjdsgsjdlgdsjglsgd",
+    secret: config.sessionSecret,
     resave: false, 
     saveUninitialized: false
 }))
@@ -50,7 +52,7 @@ app.use(fileUpload({
 var conn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'password',
+    password: config.db_pass,
     database: 'ecomstagram'
 })
 
@@ -412,7 +414,9 @@ app.post('/users/buy/:post_id', (req, res) => {
 
 app.get('/users/basket/', (req, res) => {
     if (req.session.username){
-        
+        if(!req.session.basket){
+            req.session.basket = []
+        }
         res.render('basket',  {basket:req.session.basket})
     }
     else    
