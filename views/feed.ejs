@@ -352,7 +352,8 @@
                         </div>
                         <div class="post-info">
                             <!-- profile picture and username -->
-                            <p><a href=""><%= post.username %></a> shared a product</p>
+                            <p><a href="/users/visit/<%= post.username %>"><%= post.username %></a> shared a product</p>
+				
                             <form action="/users/follow/<%= post.profile_id %>" method="POST" enctype="multipart/form-data">
                                 <button type="submit" style="float: left; margin-right: 10px;   ">
                                     Follow

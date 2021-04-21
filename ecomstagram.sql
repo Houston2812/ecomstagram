@@ -38,6 +38,7 @@ CREATE TABLE followers(
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_from INT NOT NULL,
     user_to INT NOT NULL,
+    pending BOOLEAN DEFAULT 1,
     FOREIGN KEY (user_from) REFERENCES users(id),
     FOREIGN KEY (user_to) REFERENCES users(id)
 );

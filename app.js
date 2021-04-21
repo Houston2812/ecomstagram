@@ -321,6 +321,29 @@ app.get('/users', (req, res) => {
 
 });
 
+app.get('/users/visit/:username', (req, res) => {
+    if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
+        conn.query(`SELECT * FROM users WHERE username="${req.params.username}";`, (err1, result1) => {
+            if (err1) throw err1;
+            else {
+                conn.query(`SELECT posts.* FROM posts, users WHERE posts.profile_id = users.id AND users.username = "${req.params.username}";`, (err2, result2) => {
+                    if (err2) throw err2;
+                    else {
+                        if (result2.length > 0){
+                            console.log(result2)
+                            res.render('guest_user', {user: result1[0], products: result2})
+                        } else {
+                            res.render('guest_user', {user: result1[0], products: []})
+                        }
+                    }
+                })
+            }
+        })
+    } else {
+        res.redirect('/error')
+    }
+})
 
 app.get('/users/edit/', (req, res) => {
     
@@ -508,6 +531,43 @@ app.post('/users/new_post/', (req, res) => {
         res.redirect('/error')
 })
 
+app.get('/users/follow_requests', (req, res) => {
+    if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
+        conn.query(`SELECT * FROM users WHERE username = "${req.session.username}";`, (err1, result1) => {
+            if (err1) throw err1;
+            else if (result1.length > 0) {
+                console.log(result1[0].id)
+                conn.query(`SELECT users.username, followers.id FROM users, followers WHERE followers.user_to = ${result1[0].id} AND users.id = followers.user_from AND followers.pending = 1;`, (err2, result2) => {
+                    if (err2) throw err2;
+                    if (result2.length > 0){
+                        req.session.new_followers = false;
+                        res.render('follow_requests', {username: req.session.username, followers: result2})
+                    } 
+                    else {
+                        req.session.new_followers = false;
+                        res.render('follow_requests', {username: req.session.username, followers: []})
+                    }
+                })
+
+            }
+        })
+    } else {
+        res.redirect('/error')
+    }
+})
+
+app.post('/users/follow_requests/accept/:follow_id', (req, res) => {
+    if (req.session) {
+        let sql = `UPDATE followers SET pending = 0 WHERE id = ${req.params.follow_id};`
+        conn.query(sql, (err, result) => {
+            if (err) throw err;
+            res.redirect('back')
+        })
+    } else {
+        res.redirect('/error')
+    }
+})
 
 app.post('/users/like/:post_id', (req, res) => {
     if (req.session.username){
@@ -573,6 +633,7 @@ app.post('/users/follow/:profile_id', (req, res) => {
                         sql = `INSERT INTO followers(user_from, user_to) VALUES(${result2[0].id}, ${req.params.profile_id});`
                         conn.query(sql, (err3, result3) => {
                             if (err3) throw err3;
+                            req.session.new_followers = true;
                             res.redirect('back')
                         })
                     }
@@ -614,12 +675,12 @@ app.get('/feed', (req, res) => {
     if (req.session.username){
         req.session.cookie.expires = new Date(Date.now() + hour)
 
-        let sql = `SELECT id FROM users WHERE users.username=${req.session.username};`
+        let sql = `SELECT id FROM users WHERE users.username="${req.session.username}";`
         conn.query(sql, (err0, result0) => {
             if (err0) throw err0
             if (result0[0].id){
                 // SQL QUERY TO SHOW FEEED 
-                sql = `SELECT posts.*, users.username, users.profile_picture FROM posts, users WHERE users.id = posts.profile_id AND users.username != "${req.session.username}" AND folloers;`
+                sql = `SELECT posts.*, users.username, users.profile_picture FROM posts, users WHERE users.id = posts.profile_id AND users.username != "${req.session.username}";`
                 conn.query(sql, (err, result) => {
                     if (err) throw err;
                     if (result.length > 0){

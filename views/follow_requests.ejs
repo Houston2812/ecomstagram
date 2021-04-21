@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Comstragram</title>
+</head>
+<body>
+    <h1>Follow requests of <%= username %></h1>
+    <a href="/users">Return to the user profile</a>
+    <br>
+    <table>
+        <tbody>
+            <% followers.forEach(follower => { %>
+               <tr>
+                    <td><%= follower.username %> sends request to follow you</td>
+                    <td>
+                        <form action="/users/follow_requests/accept/<%= follower.id %>" method="POST" enctype="multipart/form-data">
+                            <button type="submit">
+                                Accept
+                            </button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/users/follow_requests/decline/<%= follower.id %>" method="POST" enctype="multipart/form-data">
+                            <button type="submit">
+                                Decline
+                            </button>
+                        </form>
+                    </td>
+               </tr>                 
+            <% })  %>    
+        </tbody>
+    </table>
+
+</body>
+</html>
