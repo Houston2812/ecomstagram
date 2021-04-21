@@ -206,10 +206,10 @@ app.get('/users/edit/', (req, res) => {
 
 app.post('/users/edit/', (req, res) => {
     if (req.session.username) {
-        const {username, firstname, lastname, profile_description, date_of_birth, email_add, mobile_number} = req.body;
+        const {username, firstname, lastname, profile_description, date_of_birth, email_add, mobile_number, delivery_address} = req.body;
 
-        conn.query('UPDATE `users` SET username=?, firstname=?, lastname=?, profile_description=?, date_of_birth=?, email_add=?, mobile_number=? WHERE username = ?',
-        [username, firstname, lastname, profile_description ,date_of_birth, email_add, mobile_number, req.session.username], (err, result) => {
+        conn.query('UPDATE `users` SET username=?, firstname=?, lastname=?, profile_description=?, date_of_birth=?, email_add=?, mobile_number=?, delivery_address=? WHERE username = ?',
+        [username, firstname, lastname, profile_description ,date_of_birth, email_add, mobile_number, delivery_address, req.session.username], (err, result) => {
             if (err) throw err;
             else{
                 // console.log(result);
@@ -399,6 +399,7 @@ app.post('/users/buy/:post_id', (req, res) => {
                 if(!req.session.basket){
                     req.session.basket = []
                 }
+                product["quantity"] = 1;
                 req.session.basket.push(product);
                 console.log(req.session.basket)
 
@@ -417,7 +418,9 @@ app.get('/users/basket/', (req, res) => {
         if(!req.session.basket){
             req.session.basket = []
         }
-        res.render('basket',  {basket:req.session.basket})
+        let amount = 0;
+        (req.session.basket).forEach((item) => { amount += item.price * item.quantity})
+        res.render('basket',  {basket:req.session.basket, amount:amount})
     }
     else    
         res.redirect('/error')
@@ -427,7 +430,6 @@ app.get('/users/basket/', (req, res) => {
 app.post('/users/basket/delete/:index', (req, res) => {
     if (req.session.username){
         req.session.basket.splice(req.params.index, 1);
-        //console.log(req.session.basket)
 
         res.redirect('back');
     }
@@ -436,37 +438,45 @@ app.post('/users/basket/delete/:index', (req, res) => {
 })
 
 
-// app.post('/users/basket/purchase/', async (req, res) => {
-//     const calculateOrderAmount = items => {
-//         // Replace this constant with a calculation of the order's amount
-//         // Calculate the order total on the server to prevent
-//         // people from directly manipulating the amount on the client
-//         return 1400;
-//     };
-
-
-//     if (req.session.username){
-//         const { items } = req.body;
-//         // Create a PaymentIntent with the order amount and currency
-//         const paymentIntent = await stripe.paymentIntents.create({
-//           amount: calculateOrderAmount(items),
-//           currency: "usd"
-//         });
-//         res.send({
-//           clientSecret: paymentIntent.client_secret
-//         });
+app.post('/users/basket/:index/increase', (req, res) => {
+    if (req.session.username){
+        req.session.basket[req.params.index].quantity += 1;
         
-//     }
-//     else    
-//         res.redirect('/error')
-// })
+        res.redirect('back');
+    }
+    else    
+        res.redirect('/error')
+})
+
+
+app.post('/users/basket/:index/decrease', (req, res) => {
+    if (req.session.username){
+        if( req.session.basket[req.params.index].quantity >= 2){
+            req.session.basket[req.params.index].quantity -= 1;
+        }
+        
+        res.redirect('back');
+    }
+    else    
+        res.redirect('/error')
+})
 
 
 
 app.get('/users/basket/purchase/', (req, res) => {
     if (req.session.username){
-        
-        res.render('payment',  {key:PUBLISHABLE_KEY})
+        let amount = 0;
+        (req.session.basket).forEach((item) => { amount += item.price * item.quantity})
+
+        let sql = `SELECT delivery_address FROM users WHERE username="${req.session.username}";`
+        conn.query(sql, (err, result) => {
+            if (err) throw(err);
+            else{
+                console.log(result)
+                res.render('payment',  {key:PUBLISHABLE_KEY, amount:amount, delivery_address:result[0].delivery_address})
+            }
+        })
+
     }
     else    
         res.redirect('/error')
@@ -474,23 +484,120 @@ app.get('/users/basket/purchase/', (req, res) => {
 
   
 app.post("/create-payment-intent", async (req, res) => {
-    let amount = 0; 
-    
-    (req.session.basket).forEach((item) => { amount += item.price * 100})
+    if (req.session.username){
+        let amount = 0; 
+        
+        (req.session.basket).forEach((item) => { amount += item.price * item.quantity})
 
-    console.log(amount);
-    
-    const { items } = req.body;
-    // Create a PaymentIntent with the order amount and currency
-    const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount,
-        currency: "usd"
-    });
+        console.log(amount);
 
-    res.send({
-        clientSecret: paymentIntent.client_secret
-    });
+        // Create a PaymentIntent with the order amount and currency
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: amount * 100,
+            currency: "usd"
+        });
+
+        const { items } = req.body;
+        console.log(items);
+
+        let find_user = `SELECT * FROM users WHERE username = "${req.session.username}";`
+        conn.query(find_user, (err, result) => {
+            if (err) throw err;
+            else{
+                let payment_detail = "";
+
+                req.session.basket.forEach((item) => { 
+                    console.log(item);
+                    payment_detail = payment_detail + `Description: ${item.description}\\nQuantity: ${item.quantity}\\n`
+                
+                })
+                
+                console.log(payment_detail)
+
+                let sql = `INSERT INTO orders(profile_id, payment_total, payment_detail) values ("${result[0].id}", "${amount}", "${payment_detail}");`
+                conn.query(sql, (err, result) => {
+                    if (err) throw(err);
+                    
+
+                })
+            }
+        })
+
+        // conn.query(find_user, (err, result) => {
+        //     if (err) throw err;
+        //     else{
+        //         req.session.basket.forEach((item) => {
+        //             let sql = `INSERT INTO order_details(profile_id, post_id) values ("${result[0].id}", "${item.id}");`
+        //             conn.query(sql, (err, result) => {
+        //                 if (err) throw(err);
+                        
+        
+        //             })
+
+        //         })
+                
+        //     }
+        // })
+        req.session.basket = [];
+        res.send({
+            clientSecret: paymentIntent.client_secret
+        });
+    }else    
+        res.redirect('/error')
 });
+
+
+app.get('/users/orders/', (req, res) => {
+    if (req.session.username){
+        // let find_user = `SELECT * FROM users WHERE username = "${req.session.username}";`
+        // conn.query(find_user, (err, result) => {
+        //     if (err) throw err;
+        //     else{
+        //     console.log("menim",result);
+        //     let find_posts = `SELECT * FROM posts WHERE profile_id = "${result[0].id}";`
+        //     conn.query(find_posts, (err, result2) => {
+        //         if (err) throw err;
+        //         else{
+        //             console.log("menim neticem",result2);
+        //             result2.forEach((item) => {
+        //                 console.log("iteem",item);
+        //                 let ordered_items = `SELECT * FROM order_details WHERE post_id = "${item.id}";`
+        //                 conn.query(ordered_items, (err, result3) => {
+        //                     if (err) throw err;
+        //                     else{
+        //                         console.log("menim neticemmm",result3);
+
+        //                         res.render('orders',  {basket:req.session.basket})
+        //                     }
+        //                 })
+                        
+
+        //             })
+                    
+        //         }
+        //     })}
+        // })
+
+        let find_my_id = `SELECT id FROM users WHERE username = "${req.session.username}";`
+        conn.query(find_my_id, (err, result) => { 
+            if (err) throw err;
+             else{
+                console.log("my id", result[0].id)
+                let order_history = `SELECT * FROM orders WHERE profile_id = "${result[0].id}";`
+                conn.query(order_history, (err, result2) => { 
+                    if (err) throw err;
+                    else{
+                        console.log(result2);
+                        res.render('orders',  {order_history:result2})
+                    }
+                })
+            }
+    
+        })
+    }else{   
+        res.redirect('/error')
+    }
+})
 
 
 

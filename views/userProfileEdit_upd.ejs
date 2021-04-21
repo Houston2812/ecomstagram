@@ -52,7 +52,7 @@
             <div class="mb-3"></div>
                 <label class="form-label">Profile Description</label><br>
                 <input class="form-control" type="text" name="profile_description" 
-                    placeholder="Enter Profile Description" value="<%= user.profile_description %>" required>
+                    placeholder="Enter Profile Description" value="<%= user.profile_description %>">
             </div>
             <div class="mb-3"></div>
                 <label class="form-label">Date of Birth</label><br>
@@ -68,6 +68,11 @@
                 <label class="form-label">Mobile Number</label><br>
                 <input class="form-control" type="text" name="mobile_number" 
                     placeholder="Enter Street" value="<%= user.mobile_number %>" required>
+            </div>
+            <div class="mb-3"></div>
+                <label class="form-label">Delivery Address</label><br>
+                <input class="form-control" type="text" name="delivery_address" 
+                    placeholder="Delivery Address" value="<%= user.delivery_address %>">
             </div>
             <br><br>
             <input type="submit" class="btn btn-primary"> 
