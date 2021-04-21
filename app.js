@@ -558,6 +558,33 @@ app.post('/users/buy/:post_id', (req, res) => {
 
 })
 
+app.post('/users/follow/:profile_id', (req, res) => {
+    if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
+        let sql = `SELECT * FROM users WHERE id = ${req.params.profile_id};`
+        conn.query(sql, (err1, result1) => {
+            if (err1) throw err1;
+            if (result1.length > 0) {
+                sql = `SELECT id FROM users WHERE username="${req.session.username}";`
+                conn.query(sql, (err2, result2) => {
+                    if (err2) throw err2;
+                    if (result2[0].id){
+                        sql = `INSERT INTO followers(user_from, user_to) VALUES(${result2[0].id}, ${req.params.profile_id});`
+                        conn.query(sql, (err3, result3) => {
+                            if (err3) throw err3;
+                            res.redirect('back')
+                        })
+                    }
+                })
+            }
+        })
+    }
+    else    
+        res.redirect('/error')
+
+})
+
 
 app.get('/users/basket/', (req, res) => {
     if (req.session.username){
@@ -586,21 +613,27 @@ app.post('/users/basket/delete/:index', (req, res) => {
 app.get('/feed', (req, res) => {
     if (req.session.username){
         req.session.cookie.expires = new Date(Date.now() + hour)
-        req.session.cookie.expires = new Date(Date.now() + hour)
 
-        let sql = `SELECT posts.*, users.username, users.profile_picture FROM posts, users WHERE users.id = posts.profile_id AND users.username != "${req.session.username}";`
-
-        conn.query(sql, (err, result) => {
-            if (err) throw err;
-            if (result.length > 0){
-                console.log(result);
-                res.render('feed', {username: req.session.username, posts: result })
+        let sql = `SELECT id FROM users WHERE users.username=${req.session.username};`
+        conn.query(sql, (err0, result0) => {
+            if (err0) throw err0
+            if (result0[0].id){
+                // SQL QUERY TO SHOW FEEED 
+                sql = `SELECT posts.*, users.username, users.profile_picture FROM posts, users WHERE users.id = posts.profile_id AND users.username != "${req.session.username}" AND folloers;`
+                conn.query(sql, (err, result) => {
+                    if (err) throw err;
+                    if (result.length > 0){
+                        console.log(result);
+                        res.render('feed', {username: req.session.username, posts: result })
+                    }
+                })
             }
         })
 
+        
 
 
-        // res.render('feed', {username: req.session.username})
+
     } else {
         res.redirect('/error')
     }

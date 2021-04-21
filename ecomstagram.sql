@@ -33,3 +33,14 @@ ADD status BOOLEAN DEFAULT 0;
 
 ALTER TABLE users
 ADD confirmationCode VARCHAR(255) NOT NULL UNIQUE;
+
+CREATE TABLE followers(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_from INT NOT NULL,
+    user_to INT NOT NULL,
+    FOREIGN KEY (user_from) REFERENCES users(id),
+    FOREIGN KEY (user_to) REFERENCES users(id)
+);
+
+
+-- SELECT posts.*, users.username, users.profile_picture FROM posts, users, followers WHERE users.id = posts.profile_id AND users.username != "huseyn12" AND followers.user_from = users.id;
