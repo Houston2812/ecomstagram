@@ -36,7 +36,9 @@
                         <p>Contact:</p>
                         <p><%= user.email_add %></p>
                         <p><%= user.mobile_number %></p>
-
+                        <% if (locals.message) { %>
+                            <p style="color: red;"> <%- message.success %> </p>
+                        <% } %>
                     </div>
                     <div class="mb-3 pic">
                         <!-- <a href='/users/edit/<%= user.id %>'> -->
@@ -49,6 +51,7 @@
                             <a href="/users/basket/">
                                 <button type="button" class="btn btn-primary btn-sm">Basket</button>
                             </a>
+                      
                     </div>
                     <% products.forEach( product => { %>
                         <div class="card" style="width: 18rem;">
