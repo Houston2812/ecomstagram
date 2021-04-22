@@ -31,7 +31,7 @@ var { body, check, validationResult, custom} =  require('express-validator')
 var cookieParser = require('cookie-parser')
 var sign = require('jwt-encode')
 const nodemailer = require('nodemailer')
-const config = require('./config')
+
 const { Z_FILTERED } = require('zlib')
 
 
@@ -57,6 +57,7 @@ app.use(fileUpload({
 
 app.use(cookieParser(config.sessionSecret))
 app.use(session({
+    key: config.db_pass,
     secret: config.sessionSecret,
     resave: false, 
     saveUninitialized: false,
@@ -291,12 +292,13 @@ app.post('/login', (req, res) => {
                     req.session.username = '';
                     res.render('login')
 
+                }
             }
         } else {
             res.redirect('/login')
         }
-    })
-})
+    }
+)})
 
 app.get('/logout', (req, res)=>{
     if (req.session.username){
@@ -617,10 +619,14 @@ app.get('/users/basket/', (req, res) => {
         if(!req.session.basket){
             req.session.basket = []
         }
-
         let amount = 0;
         (req.session.basket).forEach((item) => { amount += item.price * item.quantity})
-        res.render('basket',  {basket:req.session.basket, amount:amount})
+
+        sql = `SELECT * FROM users WHERE username="${req.session.username}";`
+        conn.query(sql, (err, result) => {
+
+            res.render('basket',  {basket:req.session.basket, amount:amount, user:result[0] })
+        })
 
     }
     else    
@@ -644,12 +650,12 @@ app.get('/feed', (req, res) => {
     if (req.session.username){
         req.session.cookie.expires = new Date(Date.now() + hour)
 
-        let sql = `SELECT id FROM users WHERE users.username=${req.session.username};`
+        let sql = `SELECT id FROM users WHERE users.username="${req.session.username}";`
         conn.query(sql, (err0, result0) => {
             if (err0) throw err0
             if (result0[0].id){
                 // SQL QUERY TO SHOW FEEED 
-                sql = `SELECT posts.*, users.username, users.profile_picture FROM posts, users WHERE users.id = posts.profile_id AND users.username != "${req.session.username}" AND folloers;`
+                sql = `SELECT posts.*, users.username, users.profile_picture FROM posts, users WHERE users.id = posts.profile_id AND users.username != "${req.session.username}";`
                 conn.query(sql, (err, result) => {
                     if (err) throw err;
                     if (result.length > 0){

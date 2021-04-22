@@ -54,11 +54,15 @@
                     <% }) %>
                 </tbody>
             </table>
-            <h3>Total Amount: <%= amount %>$</h3>
-            <a href="/users/basket/purchase/">
+            <h3>Total Amount: <%= amount %>$</h3><br>
+            <% if (user.delivery_address == "") { %>
+                <p>Enter your Delivery Address on your profile to proceed to Checkout!</p>
                 <button type="button" class="btn btn-primary mt-3">Checkout</button>
-            </a>
-
+            <% }else{ %>
+                <a href="/users/basket/purchase/">
+                    <button type="button" class="btn btn-primary mt-3">Checkout</button>
+                </a>
+            <% } %>
         </div>
     </body>
 </html>
