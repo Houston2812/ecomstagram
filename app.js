@@ -58,6 +58,7 @@ app.use(fileUpload({
 app.use(cookieParser(config.sessionSecret))
 app.use(session({
     key: config.db_pass,
+    store: sessionStore,
     secret: config.sessionSecret,
     resave: false, 
     saveUninitialized: false,
