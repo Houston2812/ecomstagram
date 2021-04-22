@@ -31,20 +31,16 @@
 <body>
 	<div class="container-contact100">
 		<div class="wrap-contact100">
-			<form action="/registration" method="POST"  id="register" class="contact100-form validate-form">
+			<form action="/business_registration" method="POST"  id="register" class="contact100-form validate-form">
 				<span class="contact100-form-title">
-					Registration Form
+					Business Registration Form
 				</span>
 
-                <% if (locals.passwords_match == false) { %>
-                    <p style="color: red;">*Passwords do not match! </p>
-        
-                <% } else if (locals.username_taken == false) { %>
-                    <p style="color: red;">*The username is already taken. </p>
-                <% } else if (locals.email_used == false) { %>
-                    <p style="color: red;">*The email is currently in use. </p>
-                <% } %>
-        
+                <% if (locals.message) { %>
+					<p style="color: red;"> <%- message.error %> </p>
+				<% } %>
+
+            
 
 				<label class="label-input100" for="firstname">Enter your fullname *</label>
 				<div class="wrap-input100 rs1-wrap-input100 validate-input" data-validate="Type first name">

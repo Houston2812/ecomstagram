@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>E-Comstagram</title>
+
+	<!-- Font Awesome -->
+	
+	<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+	<!-- Reset CSS -->
+    <link rel="stylesheet" type="text/css" href="../public/css/reset.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="../public/css/style.css">
+	
+	<!-- Custom CSS -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+</head>
+
+
+
+
+<body>
+
+
+ <!-- HEADER SECTION -->
+
+	<header>
+		<div class="logo">
+            <a href="/">
+			    E-Cosmtagram
+            
+            </a>
+		</div>
+		<div class="menu">
+			<ul>
+				<li>
+					<a href="/users"><%= username %></a>
+				</li>
+				<li>
+					<a href="/users/basket">Basket</a>
+				</li>
+			</ul>
+		</div>
+		<!-- <div class="icons">
+			<ul class="options">
+				<li>
+					<a href="folu.html">
+						<i class="fa fa-users" aria-hidden="true"></i>
+					</a>
+				</li>
+				<li>
+					<a href="folu.html">
+						<i class="fa fa-comments-o" aria-hidden="true"></i></a>
+				</li>
+				<li>
+					<a href="folu.html">
+						<i class="fa fa-bell-o" aria-hidden="true"></i>
+					</a>
+				</li>
+			</ul>
+		</div> -->
+		<div class="search-area">
+			<ul>
+				<li>
+					<i class="fa fa-search" aria-hidden="true"></i>
+				</li>
+				<li>
+					<input type="text" name="search-box">
+				</li>
+				<li>
+					<i class="fa fa-times" aria-hidden="true"></i>
+				</li>
+			</ul>
+		</div>
+	</header>
+
+
+	 <!-- BIO/TOP AREA-->
+
+	 <section class="bio-area">
+	 	<div class="profile">
+	 		<div class="user-img">
+	 			<img src="https://randomuser.me/api/portraits/women/69.jpg">
+	 		</div>
+	 		<div class="user-details">
+	 			<h3>Folu Adriel Ayoola</h3>
+	 			<a href="update.html">UPDATE INFO</a>
+	 			<a href="activity.html">VIEW ACTIVITY</a>
+	 		</div>
+	 	</div>
+	 </section>
+
+
+	  <!-- CONTENT AREA: SIDE BAR & MAIN BAR-->
+<!-- 
+	  <section class="content-area">
+	  	<div class="side-bar">
+	  		<div class="widget-intro">
+	  			<div class="head">
+	  				<div class="icon">
+	  					<div class="widget-icon"><i class="fa fa-user-circle-o" aria-hidden="true"></i></div>
+	  				</div>
+	  			    <div class="widget-title">Bio</div>
+	  			</div>
+	  			<div class="body">
+	  				<h6>Business Consultant</h6>
+	  				<p>Life isn’t about finding yourself. Life is about creating yourself. I enjoy travelling, cooking and ballroom dancing.</p>
+	  				<p>Lives in Manhattan, New York</p>
+	  				<br>
+	  				<a href="#">UPDATE INFO</a>
+	  			</div>
+	  		</div>
+	  		<div class="widget-photos">
+	  			<div class="head">
+	  				<div class="icon2">
+	  					<div class="widget-icon"><i class="fa fa-picture-o" aria-hidden="true"></i></div>
+	  				</div>
+	  			    <div class="widget-title">Recent Photos</div>
+	  			</div>
+	  			<div class="body">
+	  				<div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/cooking.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/york.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/newspaper.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/coffee.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/greece.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/food.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/flowers.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/books.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/travel.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+	  				
+	  			</div>
+	  		</div>
+	  		<div class="widget-friends">
+	  			<div class="head">
+	  				<div class="icon1">
+	  					<div class="widget-icon"><i class="fa fa-user-plus" aria-hidden="true"></i></div>
+	  				</div>
+	  			    <div class="widget-title">Friends • 2567</div>
+	  			</div>
+	  			<div class="body">
+	  				<div style="display: inline-block;
+                    float: left;
+
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/friend1.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/friend2.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/friend3.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/friend4.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/friend5.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/friend6.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/friend7.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/friend8.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+
+                    <div style="display: inline-block;
+                    float: left;
+	  				width: 33.3%;
+	                height: 110px;
+	                background: url(images/friend9.jpg) no-repeat center center; 
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;"></div>
+	  			</div>
+	  		</div>
+
+	  	</div>
+ -->
+
+        <!-- MAIN BAR -->
+	  	<div class="main-bar">
+            <div class="widget-topmenu">
+	  			<ul>
+	  				<li>
+	  					<i class="fa fa-clock-o" aria-hidden="true"></i>
+	  					<span>FEED</span>
+	  				</li>
+	  				<li>
+	  					<i class="fa fa-id-badge" aria-hidden="true"></i>
+	  					<span>ABOUT</span>
+	  				</li>
+	  				<li>
+	  					<i class="fa fa-user-plus" aria-hidden="true"></i>
+	  					<span>FRIENDS</span>
+	  				</li>
+	  				<li>
+	  					<i class="fa fa-camera" aria-hidden="true"></i>
+	  					<span>PHOTOS</span>
+	  				</li>
+	  				<li>
+	  					<i class="fa fa-ellipsis-v" aria-hidden="true">
+	  						
+	  					</i>
+	  				</li>
+	  			</ul>
+	  		</div>
+            <% posts.forEach(post => { %>
+                <div class="widget-post">
+                    <div class="head">
+                        <!-- <p> <%= post.profile_picture %></p> -->
+                        <div >
+                            <img src="../public/profile_pics/<%= post.profile_picture %>" class="poster-img" alt="">
+                        </div>
+                        <div class="post-info">
+                            <!-- profile picture and username -->
+                            <p><a href=""><%= post.username %></a> shared a product</p>
+                            <form action="/users/follow/<%= post.profile_id %>" method="POST" enctype="multipart/form-data">
+                                <button type="submit" style="float: left; margin-right: 10px;   ">
+                                    Follow
+                                </button>
+                            </form>    
+                            <p>Description: <%= post.description %></p>
+                            <p>Price: <%= post.price %></p>
+
+                            <!-- <span class="post-date">April 27 at 5:30PM • via Instagram</span> -->
+                        </div>
+                        
+                    </div>
+                    <div class="body">
+                        <div >
+                        <img class="product" src="../public/posts/<%= post.username %>/<%= post.pic_name %>" >
+                        <br>
+                        </div>
+                        <p class="post-info"> <%= post.likes %> people liked it </p>	
+
+                        <div class="post-icons">
+                                <form action="/users/like/<%= post.id %>" method="POST" enctype="multipart/form-data">
+                                    <button type="submit" style="float: left; margin-right: 10px;">
+                                        Like
+                                    </button>
+                                </form>    
+                                <form action="/users/buy/<%= post.id %>" method="POST" enctype="multipart/form-data">
+                                    <button type="submit" class="">
+                                        Buy
+                                    </button>
+                                </form>
+                        </div>
+                    </div>
+                  
+                </div>
+            <% }) %>
+	  		
+	  		
+	  	</div>
+	  </section>
+
+</body>
+</html>

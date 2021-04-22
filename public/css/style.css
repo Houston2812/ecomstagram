@@ -1,0 +1,490 @@
+* {
+	box-sizing: border-box;
+
+}
+
+html {
+	font-family: 'Open Sans', sans-serif;
+}
+
+ a {
+	color: #3d6cb9;
+	text-decoration: none;
+	transition: all .2s ease-in-out;
+	font-weight: 800;
+}
+
+a:hover {
+	color: #0B5F73;
+}
+
+/* HEADER STYLES */
+header {
+	background-color: #1f4287;
+	padding: 15px;
+}
+
+header a {
+	color: white;
+	text-decoration: none;
+	font-size: 13px;
+	font-weight: 300;
+}
+
+header .fa {
+	color: white;
+	font-weight: 200;
+	font-size: 14px;
+}
+
+.logo {
+	color: white;
+	display: inline-block;
+	font-size: 20px;
+	width: 20%;
+	margin-left: -4px;
+}
+
+.logo a {
+	color: white;
+	text-decoration: none;
+}
+
+.menu {
+	display: inline-block;
+	width: 20%;
+	margin-left: -4px;
+	border-right: 1px solid #4592af;
+	text-align: right;
+	padding-right: 20px;
+}
+
+.menu a {
+	margin-right: 20px;
+}
+
+.menu ul, li {
+	display: inline-block;
+}
+
+
+.icons {
+	display: inline-block;
+	width: 20%;
+	margin-left: -4px;
+	padding-left: 20px;
+	
+}
+
+.icons, .options {
+	display: inline-block;
+	margin-left: -4px;
+	padding-left: 20px;
+	padding-right: 20px;
+
+}
+
+.icons ul li {
+	margin-right: 10px;
+}
+
+
+.search-area {
+	display: inline-block;
+	width: 40%;
+	margin-left: -4px;
+	text-align: right;
+}
+
+
+
+.search-area ul, li {
+	display: inline-block;
+
+}
+
+
+/* TOP AREA STYLES */
+.bio-area {
+	padding: 200px 15px 90px 15px;
+    background: url(images/pillow.jpg) no-repeat center center; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+
+.bio-area .profile .user-img {
+	padding: 10px;
+    display: inline-block;
+}
+
+
+.user-img img {
+	border-radius: 50%;
+}
+
+.user-details {
+	display: inline-block;
+	vertical-align: top;
+	padding-left: 20px;
+}
+
+.user-details h3 {
+	color: white;
+	font-size: 24px;
+	font-weight: 300;
+	margin-top: 50px;
+	margin-bottom: 10px;
+}
+
+.user-details a {
+	display: inline-block;
+	margin-left: -4px;
+	margin-right: 5%;
+	width: 45%;
+	text-align: center;
+	text-decoration: none;
+	color: white;
+	font-size: 10px;
+	padding: 10px;
+	-webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, .3);
+    transition: background .4s ease-in-out;
+	
+}
+
+.user-details a:hover {
+	background: #3d6cb9;
+}
+
+
+/* CONTENT AREA STYLES */
+
+.body h6, p, a {
+	padding: 5px;
+}
+
+.body p {
+	line-height: 1.4;
+}
+
+.content-area {
+	background: #fafafa;
+	overflow: auto;
+	padding: 50px 0;
+	border-radius: 3px;
+	box-shadow: 5px 10px blue;
+}
+
+/* Sidebar Styles */
+.content-area .side-bar {
+	width: 35%;
+	float: left;
+	margin: 0 2.5%;
+	max-width: 380px;
+}
+
+.widget-intro, .widget-photos, .widget-friends /*.widget-post */ {
+	padding: 4px;
+	background: #fff;
+	margin: 0 0 20px  0;
+	border-radius: 4px;
+	margin: 0 0;
+	-webkit-box-shadow: 3px 2px 6px -1px rgba(214,195,214,1);
+    -moz-box-shadow: 3px 2px 6px -1px rgba(214,195,214,1);
+    box-shadow: 3px 2px 6px -1px rgba(214,195,214,1);
+    overflow: auto;
+}
+
+
+.widget-icon {
+	background: #bfbfbf;
+	height: 40px;
+	width: 40px;
+	border-radius: 50%;
+	color: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.icon  {
+	display: inline-block;
+}
+
+.icon2 {
+	display: inline-block;
+}
+
+.icon1 {
+	display: inline-block;
+}
+
+.widget-icon .fa{
+	max-width: 50%;
+	font-size: 22px;
+}
+
+.widget-title {
+	display: inline-block;
+	padding: 0 0 0 20px;
+}
+
+.body {
+	padding: 20px 0;
+}
+
+
+
+
+
+/*  Main Bar Styles */
+.content-area .main-bar  {
+	width: 200px;
+	/* margin: 0 2.5%; */
+	margin: 0 auto;
+
+}
+
+.widget-topmenu {
+	padding: 15px 15px 0 15px;
+	background: #fff;
+	margin: 0 0 20px 0;
+	border-radius: 4px;
+	-webkit-box-shadow: 3px 2px 6px -1px rgba(214,195,214,1);
+    -moz-box-shadow: 3px 2px 6px -1px rgba(214,195,214,1);
+    box-shadow: 3px 2px 6px -1px rgba(214,195,214,1);
+    overflow: auto;
+}
+
+ .widget-topmenu ul {
+    padding: 0;
+   margin: 0 0 20px 0;
+    
+}
+
+.widget-topmenu ul li {
+	width: 20%;
+	display: inline-block;
+	float: left;
+	text-align: center;
+	border-bottom: 3px solid #fff;
+	transition: all .4s ease-in-out;
+	cursor: pointer;
+	padding: 10px;
+}
+
+
+.widget-topmenu ul li:last-child {
+	padding-top: 25px;
+	padding-left: 100px;
+
+}
+
+.widget-topmenu ul li:hover {
+	border-bottom: 3px solid #3d6cb9;
+	color: #3d6cb9;
+}
+
+span {
+	display: block;
+	margin: 15px 0 0 0;
+	font-size: 14px;
+}
+
+.widget-topmenu .fa {
+	font-size: 25px;
+}
+
+.widget-post {
+	display: inline-block;
+	padding: 15px 15px 0 15px;
+	background: #fff;
+	margin: 0 0 20px 0;
+	border-radius: 4px;
+	-webkit-box-shadow: 3px 2px 6px -1px rgba(214,195,214,1);
+    -moz-box-shadow: 3px 2px 6px -1px rgba(214,195,214,1);
+    box-shadow: 3px 2px 6px -1px rgba(214,195,214,1);
+    overflow: auto;
+    width: 100%;
+    height: auto;
+}
+
+
+.post-info {
+	display: inline-block;
+}
+
+.post-info:after {
+	content: "";
+	clear: both;
+	display: table;
+}
+
+.product {
+    display: inline-block;
+    float: left;
+    width: 25%;
+    height: 25%;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    margin-right: 100%;
+    margin-left: 10px;
+    margin-bottom: 4px;
+}
+.post-date {
+	color: #ababab;
+	font-size: 14px;
+}
+
+.poster-img {
+	display: inline-block;
+	float: left;
+    /* url(https://randomuser.me/api/portraits/women/69.jpg) */
+	background:  no-repeat center center; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 40px;
+    width: 40px;
+    margin: 0 15px 0 0;
+    border-radius: 50%;
+}
+
+
+.post-img .post-comment .post-form {
+	width: 100%;
+	height: 500px;
+  
+}
+
+
+.comment-info {
+	margin: 0 0 10px 0;
+	display: inline-block;
+}
+
+.comment-img {
+	display: inline-block;
+	float: left;
+	margin: 15px 10px 15px 10px;
+	background: url(https://randomuser.me/api/portraits/women/63.jpg) no-repeat center center; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+	
+}
+
+.post-icons {
+	margin-bottom: 0px;
+}
+
+.post-icons .fa {
+	display: inline-block;
+	font-size: 20px;
+	padding-top: 10px
+}
+
+.post-icons .fa-thumbs-up {
+	margin-right: 20px;
+	color:  #bfbfbf;
+}
+
+.post-icons .fa:last-child {
+	float: right;
+	display: inline-block;
+	right: 50px;
+	margin-right: 20px;
+	color:  #bfbfbf;
+
+}
+
+.fa-share {
+	color:  #bfbfbf;
+}
+
+.post-comment {
+	background-color: #EEEEEE;
+	height: 70px;
+	
+}
+.comment-info {
+	padding: 8px;
+}
+
+.comment-time  {
+	display: inline-block;
+	float: right;
+	font-size: 12px;
+	color: #ababab;
+}
+
+.comment-text {
+	display: inline-block;
+	float: left;
+	padding-bottom: 10px;
+	font-weight: 400;
+}
+
+.post-form {
+	display: inline-block;
+	float: left;
+	width: 100%;
+	background: #fff;
+	height: 70px;
+
+}
+
+.post-form input {
+	width: 80%;
+	border: 0 solid #fff;
+	padding-top: 30px;
+	font-size: 16px;
+	border-bottom: 1px solid #ababab;
+	float: left;
+}
+
+.post-form input:focus {
+	width: 70%;
+	border: 0 solid #fff;
+	padding: 20px;
+	margin-top: 30px;
+	font-size: 16px;
+	outline: none;
+
+}
+
+.form-img {
+	display: inline-block;
+	float: left;
+	margin: 15px 10px 15px 10px;
+	background: url(https://randomuser.me/api/portraits/women/69.jpg) no-repeat center center; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+}
+
+.form-icons .fa {
+	font-size: 20px;
+	float: right;
+	padding-top: 30px;
+	margin-right: 10px;
+	color:  #bfbfbf;
+}
+
+

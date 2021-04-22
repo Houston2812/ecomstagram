@@ -49,7 +49,11 @@
 					</div>
 
 					<footer>
-						<a href="#three" class="button">Join our platform</a>
+						<% if (username) {%>
+							<a href="/users" class="button">Go to account page</a>
+						<%} else {%>
+							<a href="#three" class="button">Join our platform</a>
+						<% } %>
 					</footer>
 				</div>
 			</section>
@@ -69,8 +73,8 @@
 							<p>Register to buy from the millions of vendors </p>
 							<p>from all around the world and sell your products. </p><br>
 							<footer>
-								<a href="/registration" class="button">User account </a><br><br>
-								<a href="/registration" class="button">Business account </a>
+								<a href="/customer_registration" class="button">User account </a><br><br>
+								<a href="/business_registration" class="button">Business account </a>
 							</footer>
 						</article>
 						<article>
@@ -85,11 +89,6 @@
 							<footer>
 								<a href="/login" class="button">User account </a><br><br>
 								<a href="/login" class="button">Business account </a>
-								<% if (locals.username) { %>
-
-									<div style="margin-top: 25px; color: red;">You are logged in. </div>
-					
-								<% } %>
 							</footer>
 						</article>
 					</div>

@@ -9,6 +9,7 @@ const fileUpload = require('express-fileupload');
 const fs = require('fs');
 const path = require('path');
 const { dir } = require('console')
+
 const config = require('./config')
 
 var MySQLStore = require('express-mysql-session')(session);
@@ -25,20 +26,24 @@ const PUBLISHABLE_KEY = config.publishable_key
 const SECRET_KEY = config.secret_key
 
 const stripe = require('stripe')(SECRET_KEY) 
+var flash = require('connect-flash')
+var { body, check, validationResult, custom} =  require('express-validator')
+var cookieParser = require('cookie-parser')
+var sign = require('jwt-encode')
+const nodemailer = require('nodemailer')
+const config = require('./config')
+const { Z_FILTERED } = require('zlib')
+
 
 var app = express()
 var port = 3000
+var hour = 3600000
+const user = config.user
+const pass = config.pass 
+
 app.set('view engine', 'ejs')
 app.use('/public',express.static('public'));
 
-
-app.use(session({
-    key: config.db_pass,
-    store: sessionStore,
-    secret: config.sessionSecret,
-    resave: false, 
-    saveUninitialized: false
-}))
 
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
@@ -47,7 +52,17 @@ app.use(fileUpload({
     useTempFiles : true,
     tempFileDir : path.join(__dirname,'tmp'),
 }));
+// app.use(expressValidator())
 // app.use(fileUpload());
+
+app.use(cookieParser(config.sessionSecret))
+app.use(session({
+    secret: config.sessionSecret,
+    resave: false, 
+    saveUninitialized: false,
+    cookie: { maxAge: 100*hour }
+}))
+app.use(flash())
 
 var conn = mysql.createConnection({
     host: 'localhost',
@@ -56,64 +71,196 @@ var conn = mysql.createConnection({
     database: 'ecomstagram'
 })
 
+const transport = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: user,
+        pass: pass,
+    }
+})
+
+var sendConfirmationEmail = (name, email, confirmationCode) => {
+    console.log(name, email, confirmationCode )
+    transport.sendMail({
+        from: user,
+        to: email,
+        subject: 'Please confirm your account',
+        html: `
+            <h1> Email Confirmation </h1>
+            <h2> Hello ${name} </h2>
+            <p> Thank you for creating an account on E-comstagram. Please activate your account by clicking at following link</p>
+            <a href=http://localhost:${port}/confirm/${confirmationCode}> Click here </a>
+            `
+    }).catch(err => console.log(err));
+}
+
 app.get(['/', '/home'], (req, res) => {
+    req.session.cookie.expires = new Date(Date.now() + hour)
     res.render('welcome', {username: req.session.username})
 })
 
-app.get('/registration', (req, res) => {
-    res.render('registration', {username_taken: req.session.username_taken, passwords_match: req.session.passwords_match, email_used: req.session.email_used})
+app.get('/customer_registration', (req, res) => {
+    res.render('customer_registration')
+})
+
+app.get('/business_registration', (req, res) => {
+    res.render('business_registration')
 })
 
 app.get('/login', (req, res)=> {
+    if (req.session.isActivated == 'false') {
+        req.flash('success', 'User registered successfully! Please activate your account through confirmation mail.')
+        res.locals.message = req.flash()
+        req.session.isActivated = 'true';
+    }
     res.render('login',  {is_logged: req.session.is_logged})
 })
 
-app.post('/registration', (req, res) => {
-    const {username, passw, passw_rep, firstname, lastname, date_of_birth, email_add, mobile_number} = req.body;
-    
+// password should contain at least one lowercase letter, one uppercase letter,
+// one numeric digit and one special character and be 7-15 characters long 
+app.post(
+    '/customer_registration', 
+    check('username')
+        .matches(/^[A-Za-z]\w{7,14}$/)
+        .withMessage('Username must be at least 7 characters long and start with letter.'),
+    check('email_add')
+        .isEmail().withMessage('Email should be entered to this field')
+        .custom((value, {req}) => {
+            return new Promise((resolve, reject) => {
+                let email_query = `select * from users where email_add = "${req.body.email_add}";`
+                conn.query(email_query, (err, result) => {
+                    if (err) throw err
+                    if (result.length > 0) [
+                        reject(new Error('Email already in use'))
+                    ]
 
-    
-    console.log(username,  passw, passw_rep, firstname, lastname, date_of_birth, email_add, mobile_number);
-    let username_query = `select * from users where username = "${username}";`
-    let email_query = `select * from users where email_add = "${email_add}";`
-
-    
-    if (passw === passw_rep) {
-        req.session.passwords_match = true;
-        conn.query(username_query, (err, result) => {
-            if (err) throw err;
-            if (result.length > 0){
-                req.session.username_taken = true;
-                res.render('registration', {username_taken: req.session.username_taken, passwords_match: req.session.passwords_match, email_used: req.session.email_used})
-            }
-            else if (result.length == 0) {
-                req.session.username_taken = false;
-                conn.query(email_query, (err2, result2) => {
-                    if (err2) throw err2;
-                    if (result2.length > 0){
-                        req.session.email_used = true;
-                        res.render('registration', {username_taken: req.session.username_taken, passwords_match: req.session.passwords_match, email_used: req.session.email_used})
-                    } 
-                    else if (result.length == 0){
-                        req.session.email_used = false;
-                        bcrypt.hash(passw, 10, (err, encPass) => {
-                            if (err)
-                                throw err;
-                            let sql = `INSERT INTO users(firstname, lastname, date_of_birth, username, password, email_add, mobile_number) values ("${firstname}", "${lastname}", "${date_of_birth}", "${username}", "${encPass}", "${email_add}", "${mobile_number}");`
-                            conn.query(sql, (err3, result3) => {
-                                if (err3) throw(err3);
-                                res.redirect('/login')
-                            })
-                        })
-                    }
+                    resolve(true)
                 })
-            }
-           
-        })
-    } else {
-        req.session.passwords_match = false;
-        res.render('registration', {username_taken: req.session.username_taken, passwords_match: req.session.passwords_match, email_used: req.session.email_used})
-    }
+            })
+        }),
+    check('passw')
+        .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{7,15}$/)
+        .withMessage('Password must be at least 7 characters long and must contain digits, symbols, uppercase and lowercase letters.'),
+    body('passw_rep').custom((value, {req}) => {
+        console.log(req.body.passw, value)
+        if (value !== req.body.passw) {
+            throw new Error('Password confirmation does not match password')
+        }
+        return true
+    }),
+    check('mobile_number')
+        .matches(/^\+\(?([0-9]{3})\)?([0-9]{6,14})$/)
+        .withMessage('Mobile number must satisfy international phone number format.'),
+    (req, res) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            var error_msg = '';
+            errors.array().forEach(err => {
+                error_msg += err.msg + '<br>'
+            })
+            req.flash('error', error_msg)
+            res.locals.message = req.flash()
+            res.render('customer_registration')
+        } else {
+            const {username, passw, passw_rep, firstname, lastname, date_of_birth, email_add, mobile_number} = req.body;    
+            const token = sign({email: email_add}, config.secret)
+
+            bcrypt.hash(passw, 10, (err, encPass) => {
+                if (err)
+                    throw err;
+                let sql = `INSERT INTO users(firstname, lastname, date_of_birth, username, password, email_add, mobile_number, confirmationCode) values ("${firstname}", "${lastname}", "${date_of_birth}", "${username}", "${encPass}", "${email_add}", "${mobile_number}", "${token}");`
+                conn.query(sql, (err1, result) => {
+                    if (err1) throw(err1);
+                    req.session.isActivated = "false";
+                    sendConfirmationEmail(username, email_add, token)
+                    res.redirect('/login')
+                })
+            })
+        }
+})
+
+app.post(
+    '/business_registration', 
+    check('username')
+        .matches(/^[A-Za-z]\w{7,14}$/)
+        .withMessage('Username must be at least 7 characters long and start with letter.'),
+    check('email_add')
+        .isEmail().withMessage('Email should be entered to this field')
+        .custom((value, { req }) => {
+            return new Promise((resolve, reject) => {
+                let email_query = `select * from users where email_add = "${req.body.email_add}";`
+                conn.query(email_query, (err, result) => {
+                    if (err) throw err
+                    if (result.length > 0) [
+                        reject(new Error('Email already in use'))
+                    ]
+
+                    resolve(true)
+                })
+            })
+        }),
+    check('passw')
+        .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{7,15}$/)
+        .withMessage('Password must be at least 7 characters long and must contain digits, symbols, uppercase and lowercase letters.'),
+    body('passw_rep').custom((value, { req }) => {
+        console.log(req.body.passw, value)
+        if (value !== req.body.passw) {
+            throw new Error('Password confirmation does not match password')
+        }
+        return true
+    }),
+    check('mobile_number')
+        .matches(/^\+\(?([0-9]{3})\)?([0-9]{6,14})$/)
+        .withMessage('Mobile number must satisfy international phone number format.'),
+    (req, res) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            var error_msg = '';
+            errors.array().forEach(err => {
+                error_msg += err.msg + '<br>'
+            })
+            req.flash('error', error_msg)
+            res.locals.message = req.flash()
+            res.render('business_registration')
+        } else {
+            const { username, passw, passw_rep, firstname, lastname, date_of_birth, email_add, mobile_number } = req.body;
+            const token = sign({email: email_add}, config.secret)
+
+            bcrypt.hash(passw, 10, (err, encPass) => {
+                if (err)
+                    throw err;
+                let sql = `INSERT INTO users(firstname, lastname, date_of_birth, username, password, specialization, email_add, mobile_number, confirmationCode) values ("${firstname}", "${lastname}", "${date_of_birth}", "${username}", "${encPass}", "business", "${email_add}",  "${mobile_number}", "${token}");`
+                conn.query(sql, (err1, result) => {
+                    if (err1) throw (err1);
+                    req.session.isActivated = "false";
+                    sendConfirmationEmail(username, email_add, token)
+                    res.redirect('/login')
+                })
+            })
+        }
+})
+
+app.get('/confirm/:confirmationCode', (req, res) => {
+    console.log(req.params.confirmationCode)
+    let sql = `select * from users where confirmationCode = "${req.params.confirmationCode}";`
+    conn.query(sql, (err, result) => {
+        if (err) throw err;
+        if (result.length > 0) {    
+            let update_sql = `update users set status = 1 where confirmationCode = "${req.params.confirmationCode}";`
+            conn.query(update_sql, (err2, result2) => {
+                if (err2) throw err2;
+                res.locals.message = ''
+                if (req.session.username){
+                    res.redirect('/users')
+                } else {
+                    res.redirect('/login')
+                }
+            })
+        }
+        else {
+            res.redirect('/error')
+        }
+    })
 })
 
 app.post('/login', (req, res) => {
@@ -124,20 +271,26 @@ app.post('/login', (req, res) => {
         console.log(result);
 
         if (result.length > 0) {
-            let compare = bcrypt.compareSync(passw, result[0].password)
-            if (compare) {
-                req.session.is_logged = true;
-                req.session.username = result[0].username;
-                // req.session.basket = [];
-                console.log(username);
-                // res.redirect('/users/' + result[0].id)
-                res.redirect('/users/')
+            if (result[0].status != 1) {
+                req.flash('error', 'Pending account. Please verify your email');
+                res.locals.message = req.flash()
+                res.render('login')
+            } else {
+                let compare = bcrypt.compareSync(passw, result[0].password)
+                if (compare) {
+                    req.session.username = result[0].username;
+                    req.session.basket = [];
+                    console.log(username);
+                    // res.redirect('/users/' + result[0].id)
+                    res.redirect('/users/')
+    
+                }
+                else {
+                    req.flash('error', 'Wrong credentaials!');
+                    res.locals.message = req.flash()
+                    req.session.username = '';
+                    res.render('login')
 
-            }
-            else {
-                req.session.is_logged = false;
-                req.session.username = '';
-                res.redirect('/login')
             }
         } else {
             res.redirect('/login')
@@ -162,6 +315,7 @@ app.get('/error', (req, res) => {
 app.get('/users', (req, res) => {
 
     if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
         conn.query(`SELECT * from users where username = "${req.session.username}";`, (err1, res1) => {
             if (err1) throw err1;
             else {
@@ -189,6 +343,7 @@ app.get('/users', (req, res) => {
 app.get('/users/edit/', (req, res) => {
     
     if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
         let find_user = `SELECT * FROM users WHERE username = "${req.session.username}";`
         conn.query(find_user, (err, result) => {
             if (err) throw err;
@@ -206,7 +361,12 @@ app.get('/users/edit/', (req, res) => {
 
 app.post('/users/edit/', (req, res) => {
     if (req.session.username) {
+
         const {username, firstname, lastname, profile_description, date_of_birth, email_add, mobile_number, delivery_address} = req.body;
+
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
+    
 
         conn.query('UPDATE `users` SET username=?, firstname=?, lastname=?, profile_description=?, date_of_birth=?, email_add=?, mobile_number=?, delivery_address=? WHERE username = ?',
         [username, firstname, lastname, profile_description ,date_of_birth, email_add, mobile_number, delivery_address, req.session.username], (err, result) => {
@@ -225,6 +385,7 @@ app.post('/users/edit/', (req, res) => {
 
 app.post('/users/edit_picture/', (req, res) => {
     if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
     
         if (!req.files || Object.keys(req.files).length === 0) {
             return res.status(400).send('No files were uploaded.');
@@ -281,6 +442,8 @@ app.post('/users/edit_picture/', (req, res) => {
 app.post('/users/remove_picture/', (req, res) => {
     
     if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         let find_user = `SELECT * FROM users WHERE username = "${req.session.username}";`
         conn.query(find_user, (err, result) => {
             if (err) throw err;
@@ -305,6 +468,8 @@ app.post('/users/remove_picture/', (req, res) => {
 
 app.get('/users/new_post/', (req, res) => {
     if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         let find_user = `SELECT * FROM users WHERE username = "${req.session.username}";`
         conn.query(find_user, (err, result) => {
             if (err) throw err;
@@ -321,6 +486,8 @@ app.get('/users/new_post/', (req, res) => {
 
 app.post('/users/new_post/', (req, res) => {
     if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         // let moment = req.timestamp
         let targetFile = req.files.file_input;
         let extName = path.extname(targetFile.name)
@@ -365,6 +532,8 @@ app.post('/users/new_post/', (req, res) => {
 
 app.post('/users/like/:post_id', (req, res) => {
     if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         const post_id = parseInt(req.params.post_id, 10);
         let prev_like;
         conn.query('SELECT likes FROM posts WHERE id = ?',[post_id] ,(err, result) => {
@@ -392,6 +561,8 @@ app.post('/users/like/:post_id', (req, res) => {
 
 app.post('/users/buy/:post_id', (req, res) => {
     if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         conn.query('SELECT * FROM posts WHERE id = ?',[req.params.post_id] ,(err, result) => {
             if (err) throw err;
             else{
@@ -412,15 +583,45 @@ app.post('/users/buy/:post_id', (req, res) => {
 
 })
 
+app.post('/users/follow/:profile_id', (req, res) => {
+    if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
+        let sql = `SELECT * FROM users WHERE id = ${req.params.profile_id};`
+        conn.query(sql, (err1, result1) => {
+            if (err1) throw err1;
+            if (result1.length > 0) {
+                sql = `SELECT id FROM users WHERE username="${req.session.username}";`
+                conn.query(sql, (err2, result2) => {
+                    if (err2) throw err2;
+                    if (result2[0].id){
+                        sql = `INSERT INTO followers(user_from, user_to) VALUES(${result2[0].id}, ${req.params.profile_id});`
+                        conn.query(sql, (err3, result3) => {
+                            if (err3) throw err3;
+                            res.redirect('back')
+                        })
+                    }
+                })
+            }
+        })
+    }
+    else    
+        res.redirect('/error')
+
+})
+
 
 app.get('/users/basket/', (req, res) => {
     if (req.session.username){
+         req.session.cookie.expires = new Date(Date.now() + hour)
         if(!req.session.basket){
             req.session.basket = []
         }
+
         let amount = 0;
         (req.session.basket).forEach((item) => { amount += item.price * item.quantity})
         res.render('basket',  {basket:req.session.basket, amount:amount})
+
     }
     else    
         res.redirect('/error')
@@ -429,6 +630,8 @@ app.get('/users/basket/', (req, res) => {
 
 app.post('/users/basket/delete/:index', (req, res) => {
     if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
         req.session.basket.splice(req.params.index, 1);
 
         res.redirect('back');
@@ -437,6 +640,34 @@ app.post('/users/basket/delete/:index', (req, res) => {
         res.redirect('/error')
 })
 
+app.get('/feed', (req, res) => {
+    if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
+        let sql = `SELECT id FROM users WHERE users.username=${req.session.username};`
+        conn.query(sql, (err0, result0) => {
+            if (err0) throw err0
+            if (result0[0].id){
+                // SQL QUERY TO SHOW FEEED 
+                sql = `SELECT posts.*, users.username, users.profile_picture FROM posts, users WHERE users.id = posts.profile_id AND users.username != "${req.session.username}" AND folloers;`
+                conn.query(sql, (err, result) => {
+                    if (err) throw err;
+                    if (result.length > 0){
+                        console.log(result);
+                        res.render('feed', {username: req.session.username, posts: result })
+                    }
+                })
+            }
+        })
+
+        
+
+
+
+    } else {
+        res.redirect('/error')
+    }
+})
 
 app.post('/users/basket/:index/increase', (req, res) => {
     if (req.session.username){
