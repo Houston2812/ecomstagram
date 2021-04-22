@@ -20,12 +20,14 @@ CREATE TABLE users(
 CREATE TABLE posts(
     id INT PRIMARY KEY AUTO_INCREMENT,
     pic_name VARCHAR(255),
+    post_name VARCHAR(255),
     profile_id INT NOT NULL,
     likes INT DEFAULT 0,
     price INT NOT NULL,
     description VARCHAR(255), 
     FOREIGN KEY (profile_id) REFERENCES users(id)
 );
+
 
 
 
@@ -60,10 +62,21 @@ CREATE TABLE followers(
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_from INT NOT NULL,
     user_to INT NOT NULL,
+    pending BOOLEAN DEFAULT 1,
     FOREIGN KEY (user_from) REFERENCES users(id),
     FOREIGN KEY (user_to) REFERENCES users(id)
 );
 
+-- SELECT posts.*, users.username, users.profile_picture FROM posts, users, followers WHERE users.id = posts.profile_id AND users.username != "huseyn12" AND followers.user_from = users.id;
+
+CREATE TABLE likes(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    post_id INT NOT NULL,
+    user_id INT NOT NULL,
+    FOREIGN KEY (post_id) REFERENCES posts(id),
+    FOREIGN KEY (user_id) REFERENCES users(id) 
+);
 
 -- SELECT posts.*, users.username, users.profile_picture FROM posts, users, followers WHERE users.id = posts.profile_id AND users.username != "huseyn12" AND followers.user_from = users.id;
+
 

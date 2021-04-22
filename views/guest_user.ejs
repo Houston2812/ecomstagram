@@ -5,8 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>E-Comstagram</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-        <link href="../public/css/userp.css" rel="stylesheet">
-        <link href="../public/css/userpposts.css" rel="stylesheet">
+        <link href="/public/css/userp.css" rel="stylesheet">
+        <link href="/public/css/userpposts.css" rel="stylesheet">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
         <style>
 
@@ -68,21 +68,29 @@
                                 
                                 
 
-                                <a href='/users/edit/'>
+                                <!-- <a href='/users/edit/'>
                                     <button class="profile-card__button button--blue js-message-btn">Edit</button>
-                                </a>
-                                <a href="/users/new_post">
+                                </a> -->
+                                <!-- <a href="/users/new_post">
                                     <button class="profile-card__button button--orange">Add new product</button>
-                                </a>
-                                <a href="/users/basket">
+                                </a> -->
+                                <!-- <a href="/users/basket">
                                     <button class="profile-card__button button--orange">Basket</button>
-                                </a>
-                                <a href="/logout">
+                                </a> -->
+                                <!-- <a href="/logout">
                                     <button class="profile-card__button button--blue js-message-btn">Log out</button>
-                                </a>
+                                </a> -->
                                 <a href="/feed">
                                     <button class="profile-card__button button--orange js-message-btn">Feed</button>
                                 </a>
+                                <!-- <a href="/feed">
+                                    <button class="profile-card__button button--blue js-message-btn">Follow requests</button>
+                                </a> -->
+                                <form action="/users/follow/<%= user.id %>" method="POST" enctype="multipart/form-data">
+                                    <button type="submit" class="profile-card__button button--blue js-message-btn">
+                                        Follow
+                                    </button>
+                                </form>    
                                
                             </div>
 
@@ -135,7 +143,7 @@
                     
                                     </div>
                     
-                                </div>  
+                                </div>
                     
                                 <div class="gallery-item" tabindex="0">
                     
@@ -320,18 +328,16 @@
                             <div class="card-body">
                             <h5 class="card-title">Price <%= product.price %>$</h5>
                             <p class="card-text"><%= product.description %></p>
-                            <form action="/users/like/<%= product.id %>" method="POST" enctype="multipart/form-data">
-                                <button type="submit" class="btn btn-primary" >
-                                    Like
-                                </button>
-                            </form>    
-                            <form action="/users/buy/<%= product.id %>" method="POST" enctype="multipart/form-data">
-                                <button type="submit" class="btn btn-primary">
-                                    Buy
-                                </button>
-                            </form>
-                            <!-- <a href="#" class="btn btn-primary">Like</a>
-                            <a href="#" class="btn btn-primary">Buy</a> -->
+                        <p class="card-text"> <span id="<%= product.id %>"><%= product.likes %>  </span> people liked it </p>	
+
+                            <button type="button" style="float: left; margin-right: 10px;" onclick="buy(<%= product.id %>)" > 
+								Buy
+							</button>
+                            <button type="button" id='btn-<%= product.id %>' style="float: left; margin-right: 10px;" onclick="like(<%= product.id %>)">
+								Like
+							</button>
+                            <a href="#" class="btn btn-primary">Like</a>
+                            <a href="#" class="btn btn-primary">Buy</a>
                             </div>
                         </div>
                     <% }) %>
@@ -340,6 +346,8 @@
                 
             </div>
         <!-- </div> -->
-        
+        <script src="/public/js/like_handler.js">
+
+        </script>
     </body>
 </html>

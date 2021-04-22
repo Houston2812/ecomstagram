@@ -20,7 +20,7 @@
 
 
 
-<body>
+<body onload="like_list()">
 
 
  <!-- HEADER SECTION -->
@@ -352,7 +352,8 @@
                         </div>
                         <div class="post-info">
                             <!-- profile picture and username -->
-                            <p><a href=""><%= post.username %></a> shared a product</p>
+                            <p><a href="/users/visit/<%= post.username %>"><%= post.username %></a> shared a product</p>
+				
                             <form action="/users/follow/<%= post.profile_id %>" method="POST" enctype="multipart/form-data">
                                 <button type="submit" style="float: left; margin-right: 10px;   ">
                                     Follow
@@ -365,24 +366,30 @@
                         </div>
                         
                     </div>
-                    <div class="body">
+                    <div class="body" >
                         <div >
                         <img class="product" src="../public/posts/<%= post.username %>/<%= post.pic_name %>" >
                         <br>
                         </div>
-                        <p class="post-info"> <%= post.likes %> people liked it </p>	
+                        <p class="post-info"> <span id="<%= post.id %>"><%= post.likes %>  </span> people liked it </p>	
 
                         <div class="post-icons">
-                                <form action="/users/like/<%= post.id %>" method="POST" enctype="multipart/form-data">
+							<button type="button" style="float: left; margin-right: 10px;" onclick="buy(<%= post.id %>)" > 
+								Buy
+							</button>
+							<button type="button" id='btn-<%= post.id %>' style="float: left; margin-right: 10px;" onclick="like(<%= post.id %>)">
+								Like
+							</button>
+                                <!-- <form action="/users/like/<%= post.id %>" method="POST" enctype="multipart/form-data">
                                     <button type="submit" style="float: left; margin-right: 10px;">
                                         Like
                                     </button>
-                                </form>    
-                                <form action="/users/buy/<%= post.id %>" method="POST" enctype="multipart/form-data">
+                                </form>     -->
+                                <!-- <form action="/users/buy/<%= post.id %>" method="POST" enctype="multipart/form-data">
                                     <button type="submit" class="">
                                         Buy
                                     </button>
-                                </form>
+                                </form> -->
                         </div>
                     </div>
                   
@@ -392,6 +399,7 @@
 	  		
 	  	</div>
 	  </section>
-
+	  <script src="/public/js/like_handler.js">
+	  </script>
 </body>
 </html>

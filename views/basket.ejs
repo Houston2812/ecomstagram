@@ -31,6 +31,10 @@
                     </tr>
                 </thead>
                 <tbody>
+
+                    <% if (basket != null) { %>
+                
+        
                     <% basket.forEach( (item, index) => { %>
                         <tr>
                             <td> <%= index + 1 %> </td>
@@ -52,6 +56,9 @@
                             </td>
                         </tr>
                     <% }) %>
+                    
+                     <% } %>
+
                 </tbody>
             </table>
             <h3>Total Amount: <%= amount %>$</h3><br>

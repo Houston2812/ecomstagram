@@ -33,6 +33,7 @@ var sign = require('jwt-encode')
 const nodemailer = require('nodemailer')
 
 const { Z_FILTERED } = require('zlib')
+const e = require('express')
 
 
 var app = express()
@@ -342,6 +343,29 @@ app.get('/users', (req, res) => {
 
 });
 
+app.get('/users/visit/:username', (req, res) => {
+    if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
+        conn.query(`SELECT * FROM users WHERE username="${req.params.username}";`, (err1, result1) => {
+            if (err1) throw err1;
+            else {
+                conn.query(`SELECT posts.* FROM posts, users WHERE posts.profile_id = users.id AND users.username = "${req.params.username}";`, (err2, result2) => {
+                    if (err2) throw err2;
+                    else {
+                        if (result2.length > 0){
+                            console.log(result2)
+                            res.render('guest_user', {user: result1[0], products: result2})
+                        } else {
+                            res.render('guest_user', {user: result1[0], products: []})
+                        }
+                    }
+                })
+            }
+        })
+    } else {
+        res.redirect('/error')
+    }
+})
 
 app.get('/users/edit/', (req, res) => {
     
@@ -495,7 +519,7 @@ app.post('/users/new_post/', (req, res) => {
         let targetFile = req.files.file_input;
         let extName = path.extname(targetFile.name)
         let baseName = targetFile.name;
-        let {description, price} = req.body
+        let {description, price, product} = req.body
         // let pic_name_hashed = bcrypt.hashSync(moment + req.session.username, 10)
         let uploadDir = path.join(__dirname, `public/posts/${req.session.username}`)
 
@@ -518,7 +542,7 @@ app.post('/users/new_post/', (req, res) => {
             conn.query(`SELECT id FROM users where username = "${req.session.username}";`, (err, resl)=> {
                 if (err) throw err;
                 //console.log(resl);
-                let sql = `INSERT INTO posts(pic_name, profile_id, price, description) VALUES ("${baseName}", ${resl[0].id}, ${price}, "${description}");` 
+                let sql = `INSERT INTO posts(pic_name, post_name, profile_id, price, description) VALUES ("${baseName}", "${product}", ${resl[0].id}, ${price}, "${description}");` 
                 conn.query(sql, (err, result) => {
                     if (err) throw err;
                     res.redirect('/users/')
@@ -532,6 +556,43 @@ app.post('/users/new_post/', (req, res) => {
         res.redirect('/error')
 })
 
+app.get('/users/follow_requests', (req, res) => {
+    if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
+        conn.query(`SELECT * FROM users WHERE username = "${req.session.username}";`, (err1, result1) => {
+            if (err1) throw err1;
+            else if (result1.length > 0) {
+                console.log(result1[0].id)
+                conn.query(`SELECT users.username, followers.id FROM users, followers WHERE followers.user_to = ${result1[0].id} AND users.id = followers.user_from AND followers.pending = 1;`, (err2, result2) => {
+                    if (err2) throw err2;
+                    if (result2.length > 0){
+                        req.session.new_followers = false;
+                        res.render('follow_requests', {username: req.session.username, followers: result2})
+                    } 
+                    else {
+                        req.session.new_followers = false;
+                        res.render('follow_requests', {username: req.session.username, followers: []})
+                    }
+                })
+
+            }
+        })
+    } else {
+        res.redirect('/error')
+    }
+})
+
+app.post('/users/follow_requests/accept/:follow_id', (req, res) => {
+    if (req.session) {
+        let sql = `UPDATE followers SET pending = 0 WHERE id = ${req.params.follow_id};`
+        conn.query(sql, (err, result) => {
+            if (err) throw err;
+            res.redirect('back')
+        })
+    } else {
+        res.redirect('/error')
+    }
+})
 
 app.post('/users/like/:post_id', (req, res) => {
     if (req.session.username){
@@ -544,13 +605,21 @@ app.post('/users/like/:post_id', (req, res) => {
             else{
                 prev_like = result[0].likes;
                 let new_like = prev_like + 1;
-                
+                conn.query(`SELECT id FROM users WHERE username = "${req.session.username}";`, (err1, result1) => {
+                    if (err1) throw err1;
+                    else if (result1.length > 0) {
+                        conn.query(`INSERT INTO likes(post_id, user_id) VALUES(${post_id}, ${result1[0].id});`, (err2, result2) => {
+                            if (err2) throw err2;
+                            console.log(`${post_id} post has been liked by ${result1[0].id}`)
+                        })
+                    }
+                })
                 conn.query('UPDATE `posts` SET likes=? WHERE id = ?',
                 [new_like, post_id] ,(err, result) => {
                     if (err) throw err;
                     else{
                         //console.log(result);
-                        res.redirect('back');
+                        res.json({likes: new_like})
                     }
                 })
             }
@@ -561,6 +630,80 @@ app.post('/users/like/:post_id', (req, res) => {
 })
 
 
+app.post('/users/dislike/:post_id', (req, res) => {
+    if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+        console.log('FUCK')
+        const post_id = parseInt(req.params.post_id, 10);
+        let prev_like;
+        conn.query('SELECT likes FROM posts WHERE id = ?',[post_id] ,(err, result) => {
+            if (err) throw err;
+            else{
+                prev_like = result[0].likes;
+                let new_like = prev_like - 1;
+                conn.query(`SELECT id FROM users WHERE username = "${req.session.username}";`, (err1, result1) => {
+                    if (err1) throw err1;
+                    else if (result1.length > 0) {
+                        conn.query(`DELETE FROM likes WHERE post_id=${post_id} AND user_id=${result1[0].id};`, (err2, result2) => {
+                        // conn.query(`INSERT INTO likes(post_id, user_id) VALUES(${post_id}, ${result1[0].id});`, (err2, result2) => {
+                            if (err2) throw err2;
+                            console.log(`${post_id} post has been disliked by ${result1[0].id}`)
+                        })
+                    }
+                })
+                conn.query('UPDATE `posts` SET likes=? WHERE id = ?',
+                [new_like, post_id] ,(err, result) => {
+                    if (err) throw err;
+                    else{
+                        //console.log(result);
+                        res.json({likes: new_like})
+                    }
+                })
+            }
+        })
+    }
+    else    
+        res.redirect('/error')
+})
+
+app.post('/users/is_liked/', (req, res) => {
+  if (req.session.username) {
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
+        const post_id = parseInt(req.params.post_id, 10)
+        let sql = `select likes.* from likes, users where likes.user_id=users.id and users.username='${req.session.username}';`
+        conn.query(sql, (err2,  result2) => {
+            if (err2) throw err2;
+            else if (result2.length > 0) {
+                res.json({is_liked: result2})
+            } else {
+                res.json({is_liked: []})
+            }
+        })
+    } else {
+        res.redirect('/error')
+    }
+})
+
+// app.get('/users/buy/:post_id', (req, res) => {
+//     if (req.session.username){
+//         req.session.cookie.expires = new Date(Date.now() + hour)
+
+//         conn.query('SELECT * FROM posts WHERE id = ?',[req.params.post_id] ,(err, result) => {
+//             if (err) throw err;
+//             else{
+//                 const product = JSON.parse(JSON.stringify(result))[0]
+//                 req.session.basket.push(product);
+//                 console.log("Basket\n" + req.session.basket)
+//                 res.status(200).send({ statusText: 'Data inserted successfully!' });
+//                 // res.redirect('/feed');
+//             }
+//         })
+//     }
+//     else    
+//         res.redirect('/error')
+
+// })
 
 app.post('/users/buy/:post_id', (req, res) => {
     if (req.session.username){
@@ -601,6 +744,7 @@ app.post('/users/follow/:profile_id', (req, res) => {
                         sql = `INSERT INTO followers(user_from, user_to) VALUES(${result2[0].id}, ${req.params.profile_id});`
                         conn.query(sql, (err3, result3) => {
                             if (err3) throw err3;
+                            req.session.new_followers = true;
                             res.redirect('back')
                         })
                     }
@@ -616,6 +760,7 @@ app.post('/users/follow/:profile_id', (req, res) => {
 
 app.get('/users/basket/', (req, res) => {
     if (req.session.username){
+
          req.session.cookie.expires = new Date(Date.now() + hour)
         if(!req.session.basket){
             req.session.basket = []
@@ -628,6 +773,7 @@ app.get('/users/basket/', (req, res) => {
 
             res.render('basket',  {basket:req.session.basket, amount:amount, user:result[0] })
         })
+
 
     }
     else    
@@ -662,6 +808,8 @@ app.get('/feed', (req, res) => {
                     if (result.length > 0){
                         console.log(result);
                         res.render('feed', {username: req.session.username, posts: result })
+                    } else {
+                        res.render('feed', {username: req.session.username, posts: []})
                     }
                 })
             }
