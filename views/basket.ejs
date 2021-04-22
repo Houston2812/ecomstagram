@@ -5,9 +5,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-        <style>
-            body{width:60%;margin: 0 auto;}
 
+        <style>
+        .temp{
+            float:left;
+            margin-right: 5px;
+        }
         </style>
     </head>
     <body>
@@ -22,28 +25,51 @@
                         <th scope="col"> # </th>
                         <th scope="col"> Description </th>
                         <th scope="col"> Price </th>
-                        <th scope="col" colspan="2"> Likes </th>
+                        <th scope="col"> Quantity </th>
+                        <th scope="col" colspan="2"> Total </th>
+                        
                     </tr>
                 </thead>
                 <tbody>
+
                     <% if (basket != null) { %>
-                        <% basket.forEach( (item, index) => { %>
-                            <tr>
-                                <td> <%= index + 1 %> </td>
-                                <td> <%= item.description %> </td>
-                                <td> <%= item.price %>$ </td>
-                                <td> <%= item.likes %> </td>
-                                <td>
-                                    <form action="/users/basket/delete/<%= index %>" method="POST">
-                                        <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <% }) %>
-                    <% } %>
+                
+        
+                    <% basket.forEach( (item, index) => { %>
+                        <tr>
+                            <td> <%= index + 1 %> </td>
+                            <td> <%= item.description %> </td>
+                            <td> <%= item.price %>$ </td>
+                            <td><p class="temp"> <%= item.quantity %> </p>
+                                <form class="temp" action="/users/basket/<%= index %>/increase/" method="POST">
+                                    <button type="submit" class="btn btn-primary btn-sm">+</button>
+                                </form>
+                                <form class="temp" action="/users/basket/<%= index %>/decrease/" method="POST">
+                                    <button type="submit" class="btn btn-primary btn-sm">-</button>
+                                </form>
+                            </td>
+                            <td> <%= item.price * item.quantity %>$ </td>
+                            <td>
+                                <form action="/users/basket/delete/<%= index %>" method="POST">
+                                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                    
+                     <% } %>
+
                 </tbody>
             </table>
-
+            <h3>Total Amount: <%= amount %>$</h3><br>
+            <% if (user.delivery_address == null || user.delivery_address == "") { %>
+                <p>Enter your Delivery Address on your profile to proceed to Checkout!</p>
+                <button type="button" class="btn btn-primary mt-3">Checkout</button>
+            <% }else{ %>
+                <a href="/users/basket/purchase/">
+                    <button type="button" class="btn btn-primary mt-3">Checkout</button>
+                </a>
+            <% } %>
         </div>
     </body>
 </html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+        <link rel="stylesheet" href="/public/payment.css" />
+        <script src="https://js.stripe.com/v3/"></script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+        <script src="/public/payment_client.js" defer></script>
+        <style>
+            body{width:30%;margin: 0 auto;}
+            .temp{
+                margin: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container temp">
+
+            <a href="/users/basket/">
+                <button type="button" class="btn btn-primary btn-sm mb-3">Back to Basket</button>
+            </a>
+
+            <form id="payment-form">
+                <h2>Confirm Order</h2><br>
+                <h5>Delivery Address: <%= delivery_address %></h5><br>
+                <h5>Total Amount: <%= amount %>$</h5><br>
+
+                <div id="card-element"><!--Stripe.js injects the Card Element--></div>
+                <button class="buttonn" id="submit">
+                  <div class="spinner hidden" id="spinner"></div>
+                  <span id="button-text">Pay now</span>
+                </button>
+                <p id="card-error" role="alert"></p>
+                <p class="result-message hidden">
+                  Payment succeeded
+                  <a href="" target="_blank"></a>
+                </p>
+            </form>
+        </div>
+    </body>
+</html>

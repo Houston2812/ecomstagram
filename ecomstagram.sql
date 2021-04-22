@@ -13,7 +13,8 @@ CREATE TABLE users(
     email_add VARCHAR(255),
     mobile_number VARCHAR(255),
     profile_description VARCHAR(255),
-    profile_picture VARCHAR(255) DEFAULT "default.jpg"
+    profile_picture VARCHAR(255) DEFAULT "default.jpg",
+    delivery_address VARCHAR(255)
 );
 
 CREATE TABLE posts(
@@ -26,6 +27,30 @@ CREATE TABLE posts(
     description VARCHAR(255), 
     FOREIGN KEY (profile_id) REFERENCES users(id)
 );
+
+
+
+
+CREATE TABLE orders(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    profile_id INT NOT NULL,
+    payment_total FLOAT,
+    payment_detail TEXT,
+    payment_date DATETIME default NOW(),
+    FOREIGN KEY (profile_id) REFERENCES users(id)
+);
+
+
+-- CREATE TABLE order_details(
+--     profile_id INT NOT NULL,
+--     post_id INT NOT NULL,
+--     quantity INT DEFAULT 1, 
+--     FOREIGN KEY (profile_id) REFERENCES users(id),
+--     FOREIGN KEY (post_id) REFERENCES posts(id)
+-- );
+
+
+
 
 ALTER TABLE users
 ADD status BOOLEAN DEFAULT 0;
@@ -51,3 +76,7 @@ CREATE TABLE likes(
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (user_id) REFERENCES users(id) 
 );
+
+-- SELECT posts.*, users.username, users.profile_picture FROM posts, users, followers WHERE users.id = posts.profile_id AND users.username != "huseyn12" AND followers.user_from = users.id;
+
+
