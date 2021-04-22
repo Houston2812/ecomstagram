@@ -25,13 +25,9 @@
             </a>
 
             <form id="payment-form">
-                <h2>Confirm Order</h2>
-                <h5>Total: x$</h5>
-                <div class="mb-3">
-                    <!-- <label class="form-label">Delivery Address</label><br> -->
-                    <input class="form-control" type="text" name="delivery_address" 
-                        placeholder="Delivery Address" value="" required>
-                </div>
+                <h2>Confirm Order</h2><br>
+                <h5>Delivery Address: <%= delivery_address %></h5><br>
+                <h5>Total Amount: <%= amount %>$</h5><br>
 
                 <div id="card-element"><!--Stripe.js injects the Card Element--></div>
                 <button class="buttonn" id="submit">
