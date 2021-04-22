@@ -1,5 +1,5 @@
 
-var stripe = Stripe("pk_test_51Ii0zJB0LNbpdNYLO62rSCK1csTbiR0jJvSOR3AQBBt71AqaB3s9vNVdkUS44qUD9uF0DCRWJ9jgZjJK7WobWgqn00L3lsU4Fz");
+var stripe = Stripe("pk_test_51Iiwn6GdXLmkg9KwgljpA2qLwQMfppMtXj5b4MNQ5HabN3JtxQmk1l1IPsgiSoogpJ7hghj1MvuMOpTyrdrfoQ6200BytOVUCo");
 
 // The items the customer wants to buy
 var purchase = {

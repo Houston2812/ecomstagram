@@ -517,10 +517,11 @@ app.post("/create-payment-intent", async (req, res) => {
                 let sql = `INSERT INTO orders(profile_id, payment_total, payment_detail) values ("${result[0].id}", "${amount}", "${payment_detail}");`
                 conn.query(sql, (err, result) => {
                     if (err) throw(err);
-                    
-
-                })
+                   
+                });
+                
             }
+            
         })
 
         // conn.query(find_user, (err, result) => {
@@ -538,10 +539,12 @@ app.post("/create-payment-intent", async (req, res) => {
                 
         //     }
         // })
-        req.session.basket = [];
+        
+        //req.session.basket = [];
         res.send({
             clientSecret: paymentIntent.client_secret
         });
+        
     }else    
         res.redirect('/error')
 });
