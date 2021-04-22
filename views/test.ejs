@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon -->
+    <link href="assets/images/favicon.png" rel="icon" type="image/png">
+    <title>Ecomstagram Feed</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Ecomstagram">
+    <!-- icons
+        ================================================== -->
+    <link rel="stylesheet" href="/public/assets/css/icons.css">
+    <!-- CSS 
+        ================================================== -->
+    <link rel="stylesheet" href="/public/assets/css/uikit.css">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
+    <link rel="stylesheet" href="/public/assets/css/tailwind.css">
+</head>
+<body>
+    <div id="wrapper">
+        <div class="main_content">
+            <div class="container m-auto">
+                <h1 class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5"> Feed </h1>
+                <div class="lg:flex justify-center lg:space-x-10 lg:space-y-0 space-y-5">
+
+                    <!-- left sidebar-->
+                    <div class="space-y-5 flex-shrink-0 lg:w-7/12">
+
+                        <% posts.forEach(post => { %>
+                            <div class="bg-white shadow rounded-md dark:bg-gray-900 -mx-2 lg:mx-0">
+                                <!-- post header-->
+                                <div class="flex justify-between items-center px-4 py-3">
+                                    <div class="flex flex-1 items-center space-x-4">
+                                        <a href="#">
+                                            <div class="bg-gradient-to-tr from-yellow-600 to-pink-600 p-0.5 rounded-full">  
+                                                <img src="/public/profile_pics/<%= post.profile_picture %>" class="bg-gray-200 border border-white rounded-full w-8 h-8">
+                                            </div>
+                                        </a>
+                                        <span class="block capitalize font-semibold dark:text-gray-100"> <a href="/users/visit/<%= post.username %>"><%= post.username %></a>shared a product </span>
+                                    </div>
+                                </div>
+        
+                                <div uk-lightbox>
+                                    <a href="/public/assets/images/post/img4.jpg">  
+                                        <img src="/public/assets/images/post/img4.jpg" alt="">
+                                    </a>
+                                </div>
+                                <div class="py-3 px-4 space-y-3"> 
+                                
+                                    <div class="flex space-x-4 lg:font-bold">
+                                        <a href="#" class="flex items-center space-x-2">
+                                            <div class="p-2 rounded-full text-black">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="22" height="22" class="dark:text-gray-100">
+                                                    <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                                                </svg>
+                                            </div>
+                                            <div> Like</div>
+                                        </a>
+                                        <a class="flex items-center space-x-2">
+                                            <div class="p-2 rounded-full text-black">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="22" height="22" class="dark:text-gray-100">
+                                                    <path fill-rule="evenodd" d="M17.671,13.945l0.003,0.002l1.708-7.687l-0.008-0.002c0.008-0.033,0.021-0.065,0.021-0.102c0-0.236-0.191-0.428-0.427-0.428H5.276L4.67,3.472L4.665,3.473c-0.053-0.175-0.21-0.306-0.403-0.306H1.032c-0.236,0-0.427,0.191-0.427,0.427c0,0.236,0.191,0.428,0.427,0.428h2.902l2.667,9.945l0,0c0.037,0.119,0.125,0.217,0.239,0.268c-0.16,0.26-0.257,0.562-0.257,0.891c0,0.943,0.765,1.707,1.708,1.707S10,16.068,10,15.125c0-0.312-0.09-0.602-0.237-0.855h4.744c-0.146,0.254-0.237,0.543-0.237,0.855c0,0.943,0.766,1.707,1.708,1.707c0.944,0,1.709-0.764,1.709-1.707c0-0.328-0.097-0.631-0.257-0.891C17.55,14.182,17.639,14.074,17.671,13.945 M15.934,6.583h2.502l-0.38,1.709h-2.312L15.934,6.583zM5.505,6.583h2.832l0.189,1.709H5.963L5.505,6.583z M6.65,10.854L6.192,9.146h2.429l0.19,1.708H6.65z M6.879,11.707h2.027l0.189,1.709H7.338L6.879,11.707z M8.292,15.979c-0.472,0-0.854-0.383-0.854-0.854c0-0.473,0.382-0.855,0.854-0.855s0.854,0.383,0.854,0.855C9.146,15.596,8.763,15.979,8.292,15.979 M11.708,13.416H9.955l-0.189-1.709h1.943V13.416z M11.708,10.854H9.67L9.48,9.146h2.228V10.854z M11.708,8.292H9.386l-0.19-1.709h2.512V8.292z M14.315,13.416h-1.753v-1.709h1.942L14.315,13.416zM14.6,10.854h-2.037V9.146h2.227L14.6,10.854z M14.884,8.292h-2.321V6.583h2.512L14.884,8.292z M15.978,15.979c-0.471,0-0.854-0.383-0.854-0.854c0-0.473,0.383-0.855,0.854-0.855c0.473,0,0.854,0.383,0.854,0.855C16.832,15.596,16.45,15.979,15.978,15.979 M16.917,13.416h-1.743l0.189-1.709h1.934L16.917,13.416z M15.458,10.854l0.19-1.708h2.218l-0.38,1.708H15.458z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                            <div> <button onclick="buy(<%= post.id %>)">Buy</button></div>
+                                        </a>
+                                    </div>
+                                    <div class="flex items-center space-x-3"> 
+                                        <div class="dark:text-gray-100">
+                                            Liked by <strong>209</strong> other people.
+                                        </div>
+                                    </div>
+                                    <div class="border-t pt-4 space-y-4 dark:border-gray-600">
+                                        <div class="flex">
+                                            <div class="text-gray-700 py-2 px-3 rounded-md bg-gray-100 h-full relative lg:ml-5 ml-2 lg:mr-20  dark:bg-gray-800 dark:text-gray-100">
+                                                <p class="leading-6"><%= post.description %></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>               
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        (function (window, document, undefined) {
+            'use strict';
+            if (!('localStorage' in window)) return;
+            var nightMode = localStorage.getItem('gmtNightMode');
+            if (nightMode) {
+                document.documentElement.className += ' dark';
+            }
+        })(window, document);
+    
+    
+        (function (window, document, undefined) {
+    
+            'use strict';
+    
+            // Feature test
+            if (!('localStorage' in window)) return;
+    
+            // Get our newly insert toggle
+            var nightMode = document.querySelector('#night-mode');
+            if (!nightMode) return;
+    
+            // When clicked, toggle night mode on or off
+            nightMode.addEventListener('click', function (event) {
+                event.preventDefault();
+                document.documentElement.classList.toggle('dark');
+                if (document.documentElement.classList.contains('dark')) {
+                    localStorage.setItem('gmtNightMode', true);
+                    return;
+                }
+                localStorage.removeItem('gmtNightMode');
+            }, false);
+    
+        })(window, document);
+    </script>
+    <script src="/public/js/like_handler.js"></script>
+ <!-- Scripts
+    ================================================== -->
+    <script src="/public/assets/js/tippy.all.min.js"></script>  
+    <script src="/public/assets/js/jquery-3.3.1.min.js"></script>
+    <script src="/public/assets/js/uikit.js"></script>
+    <script src="/public/assets/js/simplebar.js"></script>
+    <script src="/public/assets/js/custom.js"></script>
+    <script src="../../unpkg.com/ionicons%405.2.3/dist/ionicons.js"></script>
+</body>
+</html>

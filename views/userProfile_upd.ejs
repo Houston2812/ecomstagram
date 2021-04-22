@@ -15,11 +15,17 @@
         </style>
 
     </head>
-    <body>
+    <body onload="like_list()">
         <!-- <div class="container"> -->
 
             <div class="content-section">
                 <div class="media ">
+                    <a href='/users/edit/'>
+                        <button class="profile-card__button button--blue js-message-btn"><i class="fas fa-edit"></i> Edit</button>
+                    </a>
+                    <a href="/logout"  style="position: absolute; right: 0;">
+                        <button class="profile-card__button button--orange js-message-btn"><i class="fas fa-sign-out-alt"></i> Log out</button>
+                    </a>
                     <div class="wrapper">
                         <div class="profile-card js-profile-card">
                           <div class="profile-card__img">
@@ -31,11 +37,11 @@
                             <div class="profile-card__txt"><%= user.profile_description  %></div>
                             <div class="profile-card-loc">
                               <span class="profile-card-loc__icon">
-                                <svg class="icon"><use xlink:href="#icon-location"></use></svg>
+                                <svg class="icon"><i class="fas fa-user"></i></use></svg>
                               </span>
                       
                               <span class="profile-card-loc__txt">
-                                Istanbul, Turkey
+                                <%= user.username %>
                               </span>
                               
                               <!-- <p>Contact:</p>
@@ -68,22 +74,28 @@
                                 
                                 
 
-                                <a href='/users/edit/'>
+                                <!-- <a href='/users/edit/'>
                                     <button class="profile-card__button button--blue js-message-btn">Edit</button>
-                                </a>
+                                </a> -->
                                 <a href="/users/new_post">
                                     <button class="profile-card__button button--orange">Add new product</button>
                                 </a>
                                 <a href="/users/basket">
                                     <button class="profile-card__button button--orange">Basket</button>
                                 </a>
-                                <a href="/logout">
+                                <!-- <a href="/logout">
                                     <button class="profile-card__button button--blue js-message-btn">Log out</button>
-                                </a>
+                                </a> -->
                                 <a href="/feed">
                                     <button class="profile-card__button button--orange js-message-btn">Feed</button>
                                 </a>
-                               
+                                
+                                <a href="/users/orders/">
+                                <button type="button" class="profile-card__button button--orange js-message-btn">Orders</button>
+                            </a>
+                            <a href="/users/followreq">
+                                <button type="button" class="profile-card__button button--orange js-message-btn">Follow requests</button>
+                            </a>
                             </div>
 
                       
@@ -101,7 +113,8 @@
                       </svg>
 
                       <main>
-
+                          
+                        
                         <div class="container">
                     
                             <div class="gallery">
@@ -114,197 +127,36 @@
                                     <div class="gallery-item-info">
                     
                                         <ul>
-                                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> <%= product.likes %></li>
-                                            <li class="gallery-item-comments"><span class="visually-hidden">Buy</span><i class="fas fa-comment" aria-hidden="true"></i> 2</li>
+                                            <li class="gallery-item-likes" style="font-size: 25px;"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> <span id="<%= product.id %>"><%= product.likes %>  </span></li>
+                                            <li class="gallery-item-comments" style="font-size: 25px;"><span class="visually-hidden">Price: </span><i class="fas fa-dollar-sign" aria-hidden="true"></i> <%= product.price %></li>
+                                            <!-- <form action="/users/like/<%= product.id %>" method="POST" enctype="multipart/form-data">
+                                                <button type="submit" class="btn btn-primary" style="font-size: 25px; margin-left: 15%;">
+                                                    <i class="fas fa-thumbs-up"></i> Like
+                                                </button>
+                                            </form>    
+                                            <form action="/users/buy/<%= product.id %>" method="POST" enctype="multipart/form-data">
+                                                <button type="submit" class="btn btn-primary" style="font-size: 25px; margin-left: 15%;">
+                                                    <i class="fas fa-shopping-cart"></i> Buy
+                                                </button>
+                                            </form> -->
+
+
+                                            <!-- <button type="button" class="btn btn-primary" style="float: left; margin-right: 10px;" onclick="buy(<%= product.id %>)" > 
+                                                Buy
+                                            </button>
+                                            <button type="button" id='btn-<%= product.id %>' class="btn btn-primary" style="float: left; margin-right: 10px;" onclick="like(<%= product.id %>)">
+                                                Like
+                                            </button> -->
+
+
                                         </ul>
                     
                                     </div>
                     
                                 </div>
                                 <% }) %>
-                                <div class="gallery-item" tabindex="0">
-                    
-                                    <img src="https://images.unsplash.com/photo-1497445462247-4330a224fdb1?w=500&h=500&fit=crop" class="gallery-image" alt="">
-                    
-                                    <div class="gallery-item-info">
-                    
-                                        <ul>
-                                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> 89</li>
-                                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> 5</li>
-                                        </ul>
-                    
-                                    </div>
-                    
-                                </div>  
-                    
-                                <div class="gallery-item" tabindex="0">
-                    
-                                    <img src="https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=500&h=500&fit=crop" class="gallery-image" alt="">
-                    
-                                    <div class="gallery-item-type">
-                    
-                                        <span class="visually-hidden">Gallery</span><i class="fas fa-clone" aria-hidden="true"></i>
-                    
-                                    </div>
-                    
-                                    <div class="gallery-item-info">
-                    
-                                        <ul>
-                                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> 42</li>
-                                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> 1</li>
-                                        </ul>
-                    
-                                    </div>
-                    
-                                </div>
-                    
-                                <div class="gallery-item" tabindex="0">
-                    
-                                    <img src="https://images.unsplash.com/photo-1502630859934-b3b41d18206c?w=500&h=500&fit=crop" class="gallery-image" alt="">
-                    
-                                    <div class="gallery-item-type">
-                    
-                                        <span class="visually-hidden">Video</span><i class="fas fa-video" aria-hidden="true"></i>
-                    
-                                    </div>
-                    
-                                    <div class="gallery-item-info">
-                    
-                                        <ul>
-                                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> 38</li>
-                                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> 0</li>
-                                        </ul>
-                    
-                                    </div>
-                    
-                                </div>
-                    
-                                <div class="gallery-item" tabindex="0">
-                    
-                                    <img src="https://images.unsplash.com/photo-1498471731312-b6d2b8280c61?w=500&h=500&fit=crop" class="gallery-image" alt="">
-                    
-                                    <div class="gallery-item-type">
-                    
-                                        <span class="visually-hidden">Gallery</span><i class="fas fa-clone" aria-hidden="true"></i>
-                    
-                                    </div>
-                    
-                                    <div class="gallery-item-info">
-                    
-                                        <ul>
-                                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> 47</li>
-                                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> 1</li>
-                                        </ul>
-                    
-                                    </div>
-                    
-                                </div>
-                    
-                                <div class="gallery-item" tabindex="0">
-                    
-                                    <img src="https://images.unsplash.com/photo-1515023115689-589c33041d3c?w=500&h=500&fit=crop" class="gallery-image" alt="">
-                    
-                                    <div class="gallery-item-info">
-                    
-                                        <ul>
-                                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> 94</li>
-                                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> 3</li>
-                                        </ul>
-                    
-                                    </div>
-                    
-                                </div>
-                    
-                                <div class="gallery-item" tabindex="0">
-                    
-                                    <img src="https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=500&h=500&fit=crop" class="gallery-image" alt="">
-                    
-                                    <div class="gallery-item-type">
-                    
-                                        <span class="visually-hidden">Gallery</span><i class="fas fa-clone" aria-hidden="true"></i>
-                    
-                                    </div>
-                    
-                                    <div class="gallery-item-info">
-                    
-                                        <ul>
-                                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> 52</li>
-                                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> 4</li>
-                                        </ul>
-                    
-                                    </div>
-                    
-                                </div>
-                    
-                                <div class="gallery-item" tabindex="0">
-                    
-                                    <img src="https://images.unsplash.com/photo-1515814472071-4d632dbc5d4a?w=500&h=500&fit=crop" class="gallery-image" alt="">
-                    
-                                    <div class="gallery-item-info">
-                    
-                                        <ul>
-                                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> 66</li>
-                                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> 2</li>
-                                        </ul>
-                    
-                                    </div>
-                    
-                                </div>
-                    
-                                <div class="gallery-item" tabindex="0">
-                    
-                                    <img src="https://images.unsplash.com/photo-1511407397940-d57f68e81203?w=500&h=500&fit=crop" class="gallery-image" alt="">
-                    
-                                    <div class="gallery-item-type">
-                    
-                                        <span class="visually-hidden">Gallery</span><i class="fas fa-clone" aria-hidden="true"></i>
-                    
-                                    </div>
-                    
-                                    <div class="gallery-item-info">
-                    
-                                        <ul>
-                                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> 45</li>
-                                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> 0</li>
-                                        </ul>
-                    
-                                    </div>
-                    
-                                </div>
-                    
-                                <div class="gallery-item" tabindex="0">
-                    
-                                    <img src="https://images.unsplash.com/photo-1518481612222-68bbe828ecd1?w=500&h=500&fit=crop" class="gallery-image" alt="">
-                    
-                                    <div class="gallery-item-info">
-                    
-                                        <ul>
-                                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> 34</li>
-                                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> 1</li>
-                                        </ul>
-                    
-                                    </div>
-                    
-                                </div>
-                    
-                                <div class="gallery-item" tabindex="0">
-                    
-                                    <img src="https://images.unsplash.com/photo-1505058707965-09a4469a87e4?w=500&h=500&fit=crop" class="gallery-image" alt="">
-                    
-                                    <div class="gallery-item-info">
-                    
-                                        <ul>
-                                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> 41</li>
-                                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> 0</li>
-                                        </ul>
-                    
-                                    </div>
-                    
-                                </div>
-                    
-
-                            </div>
-                            <!-- End of gallery -->
+                                
+                                
                     
                             
                     
@@ -314,7 +166,7 @@
                     </main>
                       
 
-                    <% products.forEach( product => { %>
+                    <!-- <% products.forEach( product => { %>
                         <div class="card" style="width: 18rem;">
                             <img src="/public/posts/<%= user.username %>/<%= product.pic_name %>" class="card-img-top" alt="...">
                             <div class="card-body">
@@ -330,11 +182,11 @@
                                     Buy
                                 </button>
                             </form>
-                            <!-- <a href="#" class="btn btn-primary">Like</a>
-                            <a href="#" class="btn btn-primary">Buy</a> -->
+                            <a href="#" class="btn btn-primary">Like</a>
+                            <a href="#" class="btn btn-primary">Buy</a>
                             </div>
                         </div>
-                    <% }) %>
+                    <% }) %> -->
 
                 </div>
                 
@@ -342,4 +194,7 @@
         <!-- </div> -->
         
     </body>
+    <script src="/public/js/like_handler.js">
+
+    </script>
 </html>

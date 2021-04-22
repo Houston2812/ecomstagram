@@ -18,7 +18,7 @@ var options = {
 	port: 3306,
 	user: 'root',
 	password: config.db_pass,
-	database: 'ecomstagram'
+	database: 'ecomstagram_test'
 };
 var sessionStore = new MySQLStore(options);
 
@@ -71,7 +71,7 @@ var conn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: config.db_pass,
-    database: 'ecomstagram'
+    database: 'ecomstagram_test'
 })
 
 const transport = nodemailer.createTransport({
@@ -328,10 +328,10 @@ app.get('/users', (req, res) => {
                     else {
                         if (res2.length > 0){
                             console.log(res2)
-                            res.render('userProfile', {user: res1[0], products: res2})
+                            res.render('userProfile_upd', {user: res1[0], products: res2})
                         }
                         else{
-                            res.render('userProfile', {user:res1[0], products: []})
+                            res.render('userProfile_upd', {user:res1[0], products: []})
                         }
                     }
                 })
@@ -685,25 +685,6 @@ app.post('/users/is_liked/', (req, res) => {
     }
 })
 
-// app.get('/users/buy/:post_id', (req, res) => {
-//     if (req.session.username){
-//         req.session.cookie.expires = new Date(Date.now() + hour)
-
-//         conn.query('SELECT * FROM posts WHERE id = ?',[req.params.post_id] ,(err, result) => {
-//             if (err) throw err;
-//             else{
-//                 const product = JSON.parse(JSON.stringify(result))[0]
-//                 req.session.basket.push(product);
-//                 console.log("Basket\n" + req.session.basket)
-//                 res.status(200).send({ statusText: 'Data inserted successfully!' });
-//                 // res.redirect('/feed');
-//             }
-//         })
-//     }
-//     else    
-//         res.redirect('/error')
-
-// })
 
 app.post('/users/buy/:post_id', (req, res) => {
     if (req.session.username){
@@ -913,21 +894,6 @@ app.post("/create-payment-intent", async (req, res) => {
             }
         })
 
-        // conn.query(find_user, (err, result) => {
-        //     if (err) throw err;
-        //     else{
-        //         req.session.basket.forEach((item) => {
-        //             let sql = `INSERT INTO order_details(profile_id, post_id) values ("${result[0].id}", "${item.id}");`
-        //             conn.query(sql, (err, result) => {
-        //                 if (err) throw(err);
-                        
-        
-        //             })
-
-        //         })
-                
-        //     }
-        // })
     }else    
         res.redirect('/error')
 });
@@ -935,34 +901,6 @@ app.post("/create-payment-intent", async (req, res) => {
 
 app.get('/users/orders/', (req, res) => {
     if (req.session.username){
-        // let find_user = `SELECT * FROM users WHERE username = "${req.session.username}";`
-        // conn.query(find_user, (err, result) => {
-        //     if (err) throw err;
-        //     else{
-        //     console.log("menim",result);
-        //     let find_posts = `SELECT * FROM posts WHERE profile_id = "${result[0].id}";`
-        //     conn.query(find_posts, (err, result2) => {
-        //         if (err) throw err;
-        //         else{
-        //             console.log("menim neticem",result2);
-        //             result2.forEach((item) => {
-        //                 console.log("iteem",item);
-        //                 let ordered_items = `SELECT * FROM order_details WHERE post_id = "${item.id}";`
-        //                 conn.query(ordered_items, (err, result3) => {
-        //                     if (err) throw err;
-        //                     else{
-        //                         console.log("menim neticemmm",result3);
-
-        //                         res.render('orders',  {basket:req.session.basket})
-        //                     }
-        //                 })
-                        
-
-        //             })
-                    
-        //         }
-        //     })}
-        // })
 
         let find_my_id = `SELECT id FROM users WHERE username = "${req.session.username}";`
         conn.query(find_my_id, (err, result) => { 
@@ -985,6 +923,13 @@ app.get('/users/orders/', (req, res) => {
     }
 })
 
+app.get('/new_connections', (req, res) => {
+    if (req.session.username){
+        res.render('new_connections')
+    }else{
+        res.redirect('/error')
+    }
+})
 
 
 app.listen(port, () => {
