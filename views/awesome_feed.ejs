@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Favicon -->
-    <link href="assets/images/favicon.png" rel="icon" type="image/png">
-    <title>Ecomstagram Feed</title>
+    <title>E-Comstagram</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Ecomstagram">
@@ -22,14 +21,7 @@
     <div id="wrapper">
         <div class="main_content">
             <div class="container m-auto">
-                <div style="border-bottom: 1px solid silver; margin-bottom: 20px;">
-                    <a href="/feed" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5 "  id="nav-el" >Feed</a>
-                    <a href="/users" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5 " style="margin-left: 25%; margin-right: 25%;" id="nav-el" ><%= username %></a>
-                    <a href="/users/basket" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5" style="margin-right: 0%;" id="nav-el" >Basket</a>    
-                </div>
-                
-                <!-- <h1 class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5"> Feed </h1> -->
-
+                <h1 class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5"> Feed </h1>
                 <div class="lg:flex justify-center lg:space-x-10 lg:space-y-0 space-y-5">
 
                     <!-- left sidebar-->
@@ -45,7 +37,7 @@
                                                 <img src="/public/profile_pics/<%= post.profile_picture %>" class="bg-gray-200 border border-white rounded-full w-8 h-8">
                                             </div>
                                         </a>
-                                        <span class="block capitalize font-semibold dark:text-gray-100"> <a href="/users/visit/<%= post.username %>" style="color: darkblue;"><%= post.username %></a> shared a product </span>
+                                        <span class="block capitalize font-semibold dark:text-gray-100"> <a href="/users/visit/<%= post.username %>"><%= post.username %></a> shared a product </span>
                                     </div>
                                 </div>
         
@@ -94,11 +86,6 @@
                                             <div class="text-gray-700 py-2 px-3 rounded-md bg-gray-100 h-full relative lg:ml-5 ml-2 lg:mr-20  dark:bg-gray-800 dark:text-gray-100">
                                                 <p class="leading-6"><%= post.description %></p>
                                             </div>
-                                            <br>
-                                        </div>
-                                        
-                                        <div class="text-gray-700 py-2 px-3 rounded-md bg-gray-100 h-full relative lg:ml-5 ml-2 lg:mr-20  dark:bg-gray-800 dark:text-gray-100" style="width: 13%;">
-                                            <p class="leading-6"> Price: <%= post.price %></p>
                                         </div>
                                     </div>
                                 </div>   
@@ -109,52 +96,7 @@
             </div>
         </div>
     </div>
-    <script src="/public/js/like_handler.js"></script>
-
-    <script>
-        
-        (function (window, document, undefined) {
-            'use strict';
-            if (!('localStorage' in window)) return;
-            var nightMode = localStorage.getItem('gmtNightMode');
-            if (nightMode) {
-                document.documentElement.className += ' dark';
-            }
-        })(window, document);
-    
-    
-        (function (window, document, undefined) {
-    
-            'use strict';
-    
-            // Feature test
-            if (!('localStorage' in window)) return;
-    
-            // Get our newly insert toggle
-            var nightMode = document.querySelector('#night-mode');
-            if (!nightMode) return;
-    
-            // When clicked, toggle night mode on or off
-            nightMode.addEventListener('click', function (event) {
-                event.preventDefault();
-                document.documentElement.classList.toggle('dark');
-                if (document.documentElement.classList.contains('dark')) {
-                    localStorage.setItem('gmtNightMode', true);
-                    return;
-                }
-                localStorage.removeItem('gmtNightMode');
-            }, false);
-    
-        })(window, document);
+    <script src="/public/js/like_handler.js">
     </script>
- <!-- Scripts
-    ================================================== -->
-    <script src="/public/assets/js/tippy.all.min.js"></script>  
-    <script src="/public/assets/js/jquery-3.3.1.min.js"></script>
-    <script src="/public/assets/js/uikit.js"></script>
-    <script src="/public/assets/js/simplebar.js"></script>
-    <script src="/public/assets/js/custom.js"></script>
-    <!-- <script src="/public/unpkg.com/ionicons%405.2.3/dist/ionicons.js"></script> -->
-    <link rel="js" href="https://unpkg.com/ionicons%405.2.3/dist/ionicons.js">
 </body>
 </html>

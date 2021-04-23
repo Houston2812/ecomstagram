@@ -633,7 +633,6 @@ app.post('/users/like/:post_id', (req, res) => {
 app.post('/users/dislike/:post_id', (req, res) => {
     if (req.session.username){
         req.session.cookie.expires = new Date(Date.now() + hour)
-        console.log('FUCK')
         const post_id = parseInt(req.params.post_id, 10);
         let prev_like;
         conn.query('SELECT likes FROM posts WHERE id = ?',[post_id] ,(err, result) => {
@@ -788,9 +787,9 @@ app.get('/feed', (req, res) => {
                     if (err) throw err;
                     if (result.length > 0){
                         console.log(result);
-                        res.render('feed', {username: req.session.username, posts: result })
+                        res.render('test', {username: req.session.username, posts: result })
                     } else {
-                        res.render('feed', {username: req.session.username, posts: []})
+                        res.render('test1A2B3c4d_', {username: req.session.username, posts: []})
                     }
                 })
             }

@@ -23,12 +23,12 @@ function like(post_id) {
           return responce.json()
       })
       .then(data => {
-          console.log(data)
+          console.log('Likes: ' + data['likes'])
+          console.log(document.getElementById(post_id).innerHTML)
           document.getElementById(post_id).innerHTML = data['likes']
           document.getElementById('btn-'+post_id).innerHTML = 'Dislike'
           document.getElementById('btn-'+post_id).onclick = function(){dislike(post_id)} // `dislike(${post_id})`
-          // alert('Item is added to the basket')
-      })
+          })
 }
 function dislike(post_id) {
     console.log(post_id)
