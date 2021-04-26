@@ -24,8 +24,9 @@
             <div class="container m-auto">
                 <div style="border-bottom: 1px solid silver; margin-bottom: 20px;">
                     <a href="/feed" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5 "  id="nav-el" >Feed</a>
-                    <a href="/users" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5 " style="margin-left: 25%; margin-right: 25%;" id="nav-el" ><%= username %></a>
-                    <a href="/users/basket" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5" style="margin-right: 0%;" id="nav-el" >Basket</a>    
+                    <a href="/users" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5 " style="margin-left: 13%; margin-right: 13%;" id="nav-el" ><%= username %></a>
+                    <a href="/users/basket" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5" style="margin-right: 13%;" id="nav-el" >Basket</a>    
+                    <a href="/new_friends" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5" style="margin-right: 0%;" id="nav-el" >New friends</a>    
                 </div>
                 
                 <!-- <h1 class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5"> Feed </h1> -->
@@ -33,7 +34,7 @@
                 <div class="lg:flex justify-center lg:space-x-10 lg:space-y-0 space-y-5">
 
                     <!-- left sidebar-->
-                    <div class="space-y-5 flex-shrink-0 lg:w-7/12">
+                    <div class="space-y-5 flex-shrink-0 lg:w-7/12" >
 
                         <% posts.forEach(post => { %>
                             <div class="bg-white shadow rounded-md dark:bg-gray-900 -mx-2 lg:mx-0">

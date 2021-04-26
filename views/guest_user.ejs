@@ -15,7 +15,7 @@
         </style>
 
     </head>
-    <body onload="like_list()">
+    <body onload="on_guest_load(<%= user.id %>)">
         <!-- <div class="container"> -->
 
             <div class="content-section">
@@ -87,7 +87,7 @@
                                     <button class="profile-card__button button--blue js-message-btn">Follow requests</button>
                                 </a> -->
                                 <form action="/users/follow/<%= user.id %>" method="POST" enctype="multipart/form-data">
-                                    <button type="submit" class="profile-card__button button--blue js-message-btn">
+                                    <button type="button" class="profile-card__button button--blue js-message-btn" id='btn-<%= user.id %>' onclick="follow(<%= user.id %>)">
                                         Follow
                                     </button>
                                 </form>    
@@ -171,6 +171,38 @@
         <!-- </div> -->
     </body>
     <script src="/public/js/like_handler.js">
-
+    </script>
+    <script>
+         function follow(profile_id) {
+            fetch(`http://localhost:3000/users/follow/${profile_id}`, {
+                method: 'POST'
+            })
+                .then(responce => {
+                    console.log('Responce ' + responce)
+                    return responce.json()
+                })
+                .then(data => {
+                    console.log(data)
+                    document.getElementById('btn-' + profile_id).innerHTML = 'Pending'
+                    document.getElementById('btn-' + profile_id).onclick = null
+                })
+        }
+        function on_guest_load(profile_id) {
+            like_list()
+            fetch(`http://localhost:3000/users/follow_requests/is_requested/${profile_id}`,{
+                method: 'POST'
+            })
+                .then(responce => {
+                    console.log("Responce " + responce)
+                    return responce.json()
+                })
+                .then(data => {
+                    console.log(data)
+                    if (data['message'] != 'none') {
+                        document.getElementById('btn-' + profile_id).onclick = null
+                        document.getElementById('btn-' + profile_id).innerHTML = data['message']                        
+                    }
+                }) 
+        }
     </script>
 </html>

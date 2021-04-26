@@ -35,7 +35,6 @@ const nodemailer = require('nodemailer')
 const { Z_FILTERED } = require('zlib')
 const e = require('express')
 
-
 var app = express()
 var port = 3000
 var hour = 3600000
@@ -315,7 +314,6 @@ app.get('/error', (req, res) => {
     res.render('error')
 })
 
-
 app.get('/users', (req, res) => {
 
     if (req.session.username) {
@@ -385,7 +383,6 @@ app.get('/users/edit/', (req, res) => {
 
 });
 
-
 app.post('/users/edit/', (req, res) => {
     if (req.session.username) {
 
@@ -408,7 +405,6 @@ app.post('/users/edit/', (req, res) => {
         res.redirect('/error')
     }
 });
-
 
 app.post('/users/edit_picture/', (req, res) => {
     if (req.session.username) {
@@ -464,7 +460,6 @@ app.post('/users/edit_picture/', (req, res) => {
         res.redirect('/error')
     }
 });
-
 
 app.post('/users/remove_picture/', (req, res) => {
     
@@ -563,15 +558,15 @@ app.get('/users/follow_requests', (req, res) => {
             if (err1) throw err1;
             else if (result1.length > 0) {
                 console.log(result1[0].id)
-                conn.query(`SELECT users.username, followers.id FROM users, followers WHERE followers.user_to = ${result1[0].id} AND users.id = followers.user_from AND followers.pending = 1;`, (err2, result2) => {
+                conn.query(`SELECT users.username, users.profile_picture, followers.id FROM users, followers WHERE followers.user_to = ${result1[0].id} AND users.id = followers.user_from AND followers.pending = 1;`, (err2, result2) => {
                     if (err2) throw err2;
                     if (result2.length > 0){
                         req.session.new_followers = false;
-                        res.render('follow_requests', {username: req.session.username, followers: result2})
+                        res.render('new_connections', {username: req.session.username, followers: result2})
                     } 
                     else {
                         req.session.new_followers = false;
-                        res.render('follow_requests', {username: req.session.username, followers: []})
+                        res.render('new_connections', {username: req.session.username, followers: []})
                     }
                 })
 
@@ -582,12 +577,87 @@ app.get('/users/follow_requests', (req, res) => {
     }
 })
 
+app.post('/users/follow/:profile_id', (req, res) => {
+    if (req.session.username){
+        req.session.cookie.expires = new Date(Date.now() + hour)
+
+        let sql = `SELECT * FROM users WHERE id = ${req.params.profile_id};`
+        conn.query(sql, (err1, result1) => {
+            if (err1) throw err1;
+            if (result1.length > 0) {
+                sql = `SELECT id FROM users WHERE username="${req.session.username}";`
+                conn.query(sql, (err2, result2) => {
+                    if (err2) throw err2;
+                    if (result2[0].id){
+                        sql = `SELECT * FROM followers WHERE user_from = ${result2[0].id} AND user_to = ${req.params.profile_id};`
+                        conn.query(sql, (err4, result4) => {
+                            if (err4) throw err4;
+                            else if (result4.length > 0) {
+                                res.json({'message': 'request is already sent'})
+                            } else {
+                                sql = `INSERT INTO followers(user_from, user_to) VALUES(${result2[0].id}, ${req.params.profile_id});`
+                                conn.query(sql, (err3, result3) => {
+                                    if (err3) throw err3;
+                                    req.session.new_followers = true;
+                                    res.json({'message': 'follow request sent'})
+                                })
+                            }
+                        })
+                        
+                    }
+                })
+            }
+        })
+    }
+    else    
+        res.redirect('/error')
+
+})
+
+app.post('/users/follow_requests/is_requested/:follow_id', (req, res) => {
+    if (req.session.username) {
+        let sql = `SELECT id FROM users WHERE username="${req.session.username}";`
+        conn.query(sql, (err2, result2) => {
+            if (err2) throw err2;
+            if (result2[0].id){
+                sql = `SELECT * FROM followers WHERE user_from = ${result2[0].id} AND user_to = ${req.params.follow_id};`
+                conn.query(sql, (err4, result4) => {
+                    if (err4) throw err4;
+                    else if (result4.length > 0) {
+                        if (result4[0].pending == 1)
+                            res.json({'message': 'Pending'})
+                        else 
+                            res.json({'message': 'Accepted'})
+                    } else {
+                        res.json({'message': 'none'})
+                    }
+                })
+            }
+        })
+    } else {
+        res.redirect('/error')
+    }
+})
+
 app.post('/users/follow_requests/accept/:follow_id', (req, res) => {
-    if (req.session) {
+    if (req.session.username) {
         let sql = `UPDATE followers SET pending = 0 WHERE id = ${req.params.follow_id};`
         conn.query(sql, (err, result) => {
             if (err) throw err;
-            res.redirect('back')
+            res.json({'message': 'accepted'})
+
+        })
+    } else {
+        res.redirect('/error')
+    }
+})
+
+app.post('/users/follow_request/decline/:follow_id', (req, res) => {
+    if (req.session.username){
+        let sql = `DELETE FROM followers WHERE id = ${req.params.follow_id};`
+        conn.query(sql, (err, result) => {
+            if (err) throw err;
+            res.json({'message': 'deleted'})
         })
     } else {
         res.redirect('/error')
@@ -628,7 +698,6 @@ app.post('/users/like/:post_id', (req, res) => {
     else    
         res.redirect('/error')
 })
-
 
 app.post('/users/dislike/:post_id', (req, res) => {
     if (req.session.username){
@@ -684,7 +753,6 @@ app.post('/users/is_liked/', (req, res) => {
     }
 })
 
-
 app.post('/users/buy/:post_id', (req, res) => {
     if (req.session.username){
         req.session.cookie.expires = new Date(Date.now() + hour)
@@ -709,35 +777,6 @@ app.post('/users/buy/:post_id', (req, res) => {
 
 })
 
-app.post('/users/follow/:profile_id', (req, res) => {
-    if (req.session.username){
-        req.session.cookie.expires = new Date(Date.now() + hour)
-
-        let sql = `SELECT * FROM users WHERE id = ${req.params.profile_id};`
-        conn.query(sql, (err1, result1) => {
-            if (err1) throw err1;
-            if (result1.length > 0) {
-                sql = `SELECT id FROM users WHERE username="${req.session.username}";`
-                conn.query(sql, (err2, result2) => {
-                    if (err2) throw err2;
-                    if (result2[0].id){
-                        sql = `INSERT INTO followers(user_from, user_to) VALUES(${result2[0].id}, ${req.params.profile_id});`
-                        conn.query(sql, (err3, result3) => {
-                            if (err3) throw err3;
-                            req.session.new_followers = true;
-                            res.redirect('back')
-                        })
-                    }
-                })
-            }
-        })
-    }
-    else    
-        res.redirect('/error')
-
-})
-
-
 app.get('/users/basket/', (req, res) => {
     if (req.session.username){
 
@@ -760,7 +799,6 @@ app.get('/users/basket/', (req, res) => {
         res.redirect('/error')
 })
 
-
 app.post('/users/basket/delete/:index', (req, res) => {
     if (req.session.username){
         req.session.cookie.expires = new Date(Date.now() + hour)
@@ -782,14 +820,14 @@ app.get('/feed', (req, res) => {
             if (err0) throw err0
             if (result0[0].id){
                 // SQL QUERY TO SHOW FEEED 
-                sql = `SELECT posts.*, users.username, users.profile_picture FROM posts, users WHERE users.id = posts.profile_id AND users.username != "${req.session.username}";`
+                sql = `SELECT posts.*, users.username, users.profile_picture FROM posts, users, followers WHERE users.id = posts.profile_id AND users.username != "${req.session.username}" and followers.user_to = users.id and followers.pending = 0;`
                 conn.query(sql, (err, result) => {
                     if (err) throw err;
                     if (result.length > 0){
                         console.log(result);
-                        res.render('test', {username: req.session.username, posts: result })
+                        res.render('feed_final', {username: req.session.username, posts: result })
                     } else {
-                        res.render('test1A2B3c4d_', {username: req.session.username, posts: []})
+                        res.render('feed_final', {username: req.session.username, posts: []})
                     }
                 })
             }
@@ -799,6 +837,55 @@ app.get('/feed', (req, res) => {
 
 
 
+    } else {
+        res.redirect('/error')
+    }
+})
+
+app.get('/new_friends', (req, res) => {
+    if (req.session.username) {
+        let sql = `SELECT * FROM followers;`
+        conn.query(sql, (err1, result1) => {
+            if (err1) throw err1;
+            if (result1.length == 0)
+            {
+                sql = `SELECT * FROM users WHERE username != "${req.session.username}";`
+                conn.query(sql, (err2, result2) => {
+                    if (err2) throw err2;
+                    if (result2.length > 0) {
+                        res.render('new_friends', {friends: result2})
+                    } else {
+                        res.render('new_friends', {friends: []})
+                    }
+                })
+            } else {
+                sql = `SELECT COUNT(followers.id) as count from followers, users where followers.user_from = users.id and users.username = "${req.session.username}";`
+                conn.query(sql, (err4, result4) => {
+                    if (err4) throw err4;
+                    if (result4.length > 0) {
+                        sql = `SELECT COUNT(id) as count FROM users WHERE  username != "${req.session.username}";`
+                        conn.query(sql, (err5, result5) => {
+                            if (err5) throw err5;
+                            if (result5.length > 0) {
+                                if (result5[0].count == result4[0].count) {
+                                    res.render('new_friends', {friends: []})
+                                } else {
+                                    sql = `SELECT DISTINCT users.* FROM followers, users WHERE followers.user_to != users.id AND users.username != '${req.session.username}';`
+                                    conn.query(sql, (err, result) => {
+                                        if (err) throw err;
+                                        if (result.length > 0) {
+                                            res.render('new_friends', {friends: result})            
+                                        } else {
+                                            res.render('new_friends', {friends: []})
+                                        }
+                                    })
+                                }
+                            }
+                        })
+                    }
+                })
+            }
+        })
     } else {
         res.redirect('/error')
     }
@@ -814,7 +901,6 @@ app.post('/users/basket/:index/increase', (req, res) => {
         res.redirect('/error')
 })
 
-
 app.post('/users/basket/:index/decrease', (req, res) => {
     if (req.session.username){
         if( req.session.basket[req.params.index].quantity >= 2){
@@ -826,7 +912,6 @@ app.post('/users/basket/:index/decrease', (req, res) => {
     else    
         res.redirect('/error')
 })
-
 
 
 app.get('/users/basket/purchase/', (req, res) => {
@@ -847,7 +932,6 @@ app.get('/users/basket/purchase/', (req, res) => {
     else    
         res.redirect('/error')
 })
-
   
 app.post("/create-payment-intent", async (req, res) => {
     if (req.session.username){
@@ -897,7 +981,6 @@ app.post("/create-payment-intent", async (req, res) => {
         res.redirect('/error')
 });
 
-
 app.get('/users/orders/', (req, res) => {
     if (req.session.username){
 
@@ -929,7 +1012,6 @@ app.get('/new_connections', (req, res) => {
         res.redirect('/error')
     }
 })
-
 
 app.listen(port, () => {
     console.log(`Server started at http://localhost:${port}`)
