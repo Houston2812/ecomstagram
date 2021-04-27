@@ -21,20 +21,112 @@
 <body onload="like_list()">
     <div id="wrapper">
         <div class="main_content">
-            <div class="container m-auto">
-                <div style="border-bottom: 1px solid silver; margin-bottom: 20px;">
-                    <a href="/feed" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5 "  id="nav-el" >Feed</a>
-                    <a href="/users" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5 " style="margin-left: 13%; margin-right: 13%;" id="nav-el" ><%= username %></a>
-                    <a href="/users/basket" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5" style="margin-right: 13%;" id="nav-el" >Basket</a>    
-                    <a href="/new_friends" class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5" style="margin-right: 0%;" id="nav-el" >New friends</a>    
+
+            <!-- SIDEBAR -->
+            <div class="sidebar mr-auto">
+                <div class="border-b border-gray-20 flex justify-between items-center p-3 pl-5 relative uk-hidden@s">
+                    <h3 class="text-xl"> Navigation </h3>
+                    <span class="btn-mobile" uk-toggle="target: #wrapper ; cls: sidebar-active"></span>
                 </div>
-                
+                <div class="sidebar_inner" data-simplebar>
+                    <div class="flex flex-col items-center my-6 uk-visible@s">
+                        <div
+                            class="bg-gradient-to-tr from-yellow-600 to-pink-600 p-1 rounded-full transition m-0.5 mr-2  w-24 h-24">
+                            <img src="/public/profile_pics/<%= username.profile_picture %>"
+                                class="bg-gray-200 border-4 border-white rounded-full w-full h-full">
+                        </div>
+                        <a href="/users/" class="text-xl font-medium capitalize mt-4 uk-link-reset"> <%= username.username %>
+                        </a>
+                    </div>
+                    <hr class="-mx-4 -mt-1 uk-visible@s">
+                    <ul>
+                        <li class="active">
+                            <a href="/feed">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                </svg>
+                                <span> Feed </span> </a>
+                        </li>
+                        <li>
+                            <a href="/new_friends">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <span> New Friends </span> </a>
+                        </li>
+                        <li>
+                            <a href="users/follow_requests">
+                                <i class="uil-location-arrow"></i>
+                                <span> Follow Requests </span></a>
+                        </li>
+                        <li>
+                            <a href="/users/basket">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+                                </svg>
+                                <span> My Basket </span> </a>
+                        </li>
+                        <li>
+                            <a href="/users/orders/">
+                                <i class="uil-store"></i>
+                                <span> My Orders </span> </a>
+                        </li>
+                        <li>
+                            <a href="/users/edit/">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span> Settings </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/users">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <span> My Profile </span> </a>
+                        </li>
+                        <li>
+                            <hr class="my-2">
+                        </li>
+                        <li>
+                            <a href="/logout">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                <span> Logout </span> </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- SIDEBAR END -->
+
+            <div class="container m-auto">                
                 <!-- <h1 class="lg:text-2xl text-lg font-extrabold leading-none text-gray-900 tracking-tight mb-5"> Feed </h1> -->
 
-                <div class="lg:flex justify-center lg:space-x-10 lg:space-y-0 space-y-5">
+                
 
+                <div class="lg:flex justify-center lg:space-x-10 lg:space-y-0 space-y-5">
+                    
                     <!-- left sidebar-->
                     <div class="space-y-5 flex-shrink-0 lg:w-7/12" >
+
 
                         <% posts.forEach(post => { %>
                             <div class="bg-white shadow rounded-md dark:bg-gray-900 -mx-2 lg:mx-0">
@@ -51,11 +143,11 @@
                                 </div>
         
                                 <div uk-lightbox>
-                                    <a href="">
+                                    <!-- <a href=""> -->
                                     <!-- <a href="/public/assets/images/post/img4.jpg"> -->
-                                        <img class="product" src="../public/posts/<%= post.username %>/<%= post.pic_name %>" >
+                                        <img class="product" src="/public/posts/<%= post.username %>/<%= post.pic_name %>" >
                                         <!-- <img src="/public/assets/images/post/img4.jpg" alt=""> -->
-                                    </a>
+                                    <!-- </a> -->
                                 </div>
                                 <div class="py-3 px-4 space-y-3"> 
                                 
@@ -83,6 +175,19 @@
                                                 </button>
                                             </div>
                                         </a>
+                                        <a class="flex items-center space-x-2">
+                                            <div class="p-2 rounded-full text-black">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="22" height="22" class="dark:text-gray-100">
+                                                    <path fill-rule="evenodd" d="M4.319,8.257c-0.242,0-0.438,0.196-0.438,0.438c0,0.243,0.196,0.438,0.438,0.438c0.242,0,0.438-0.196,0.438-0.438C4.757,8.454,4.561,8.257,4.319,8.257 M7.599,10.396c0,0.08,0.017,0.148,0.05,0.204c0.034,0.056,0.076,0.104,0.129,0.144c0.051,0.04,0.112,0.072,0.182,0.097c0.041,0.015,0.068,0.028,0.098,0.04V9.918C7.925,9.927,7.832,9.958,7.747,10.02C7.648,10.095,7.599,10.22,7.599,10.396 M15.274,6.505H1.252c-0.484,0-0.876,0.392-0.876,0.876v7.887c0,0.484,0.392,0.876,0.876,0.876h14.022c0.483,0,0.876-0.392,0.876-0.876V7.381C16.15,6.897,15.758,6.505,15.274,6.505M1.69,7.381c0.242,0,0.438,0.196,0.438,0.438S1.932,8.257,1.69,8.257c-0.242,0-0.438-0.196-0.438-0.438S1.448,7.381,1.69,7.381M1.69,15.269c-0.242,0-0.438-0.196-0.438-0.438s0.196-0.438,0.438-0.438c0.242,0,0.438,0.195,0.438,0.438S1.932,15.269,1.69,15.269M14.836,15.269c-0.242,0-0.438-0.196-0.438-0.438s0.196-0.438,0.438-0.438s0.438,0.195,0.438,0.438S15.078,15.269,14.836,15.269M15.274,13.596c-0.138-0.049-0.283-0.08-0.438-0.08c-0.726,0-1.314,0.589-1.314,1.314c0,0.155,0.031,0.301,0.08,0.438H2.924c0.049-0.138,0.081-0.283,0.081-0.438c0-0.726-0.589-1.314-1.315-1.314c-0.155,0-0.3,0.031-0.438,0.08V9.053C1.39,9.103,1.535,9.134,1.69,9.134c0.726,0,1.315-0.588,1.315-1.314c0-0.155-0.032-0.301-0.081-0.438h10.678c-0.049,0.137-0.08,0.283-0.08,0.438c0,0.726,0.589,1.314,1.314,1.314c0.155,0,0.301-0.031,0.438-0.081V13.596z M14.836,8.257c-0.242,0-0.438-0.196-0.438-0.438s0.196-0.438,0.438-0.438s0.438,0.196,0.438,0.438S15.078,8.257,14.836,8.257 M12.207,13.516c-0.242,0-0.438,0.196-0.438,0.438s0.196,0.438,0.438,0.438s0.438-0.196,0.438-0.438S12.449,13.516,12.207,13.516 M8.812,11.746c-0.059-0.043-0.126-0.078-0.199-0.104c-0.047-0.017-0.081-0.031-0.117-0.047v1.12c0.137-0.021,0.237-0.064,0.336-0.143c0.116-0.09,0.174-0.235,0.174-0.435c0-0.092-0.018-0.17-0.053-0.233C8.918,11.842,8.87,11.788,8.812,11.746 M18.78,3.875H4.757c-0.484,0-0.876,0.392-0.876,0.876V5.19c0,0.242,0.196,0.438,0.438,0.438c0.242,0,0.438-0.196,0.438-0.438V4.752H18.78v7.888h-1.315c-0.242,0-0.438,0.196-0.438,0.438c0,0.243,0.195,0.438,0.438,0.438h1.315c0.483,0,0.876-0.393,0.876-0.876V4.752C19.656,4.268,19.264,3.875,18.78,3.875 M8.263,8.257c-1.694,0-3.067,1.374-3.067,3.067c0,1.695,1.373,3.068,3.067,3.068c1.695,0,3.067-1.373,3.067-3.068C11.33,9.631,9.958,8.257,8.263,8.257 M9.488,12.543c-0.062,0.137-0.147,0.251-0.255,0.342c-0.108,0.092-0.234,0.161-0.378,0.209c-0.123,0.041-0.229,0.063-0.359,0.075v0.347H8.058v-0.347c-0.143-0.009-0.258-0.032-0.388-0.078c-0.152-0.053-0.281-0.128-0.388-0.226c-0.108-0.098-0.191-0.217-0.25-0.359c-0.059-0.143-0.087-0.307-0.083-0.492h0.575c-0.004,0.219,0.046,0.391,0.146,0.518c0.088,0.109,0.207,0.165,0.388,0.185v-1.211c-0.102-0.031-0.189-0.067-0.3-0.109c-0.136-0.051-0.259-0.116-0.368-0.198c-0.109-0.082-0.198-0.183-0.265-0.306c-0.067-0.123-0.101-0.275-0.101-0.457c0-0.159,0.031-0.298,0.093-0.419c0.062-0.121,0.146-0.222,0.252-0.303S7.597,9.57,7.735,9.527C7.85,9.491,7.944,9.474,8.058,9.468V9.134h0.438v0.333c0.114,0.005,0.207,0.021,0.319,0.054c0.134,0.04,0.251,0.099,0.351,0.179c0.099,0.079,0.178,0.18,0.237,0.303c0.059,0.122,0.088,0.265,0.088,0.427H8.916c-0.007-0.169-0.051-0.297-0.134-0.387C8.712,9.968,8.626,9.932,8.496,9.919v1.059c0.116,0.035,0.213,0.074,0.333,0.118c0.145,0.053,0.272,0.121,0.383,0.203c0.111,0.083,0.2,0.186,0.268,0.308c0.067,0.123,0.101,0.273,0.101,0.453C9.581,12.244,9.549,12.406,9.488,12.543" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                            <div> 
+                                                <!-- <button type="button" onclick="buy(<%= post.id %>)" > -->
+                                                <button type="button"> 
+                                                    Price: <%= post.price %>
+                                                </button>
+                                            </div>
+                                        </a>
                                     </div>
                                     <div class="flex items-center space-x-3"> 
                                         <div class="dark:text-gray-100">
@@ -96,10 +201,6 @@
                                                 <p class="leading-6"><%= post.description %></p>
                                             </div>
                                             <br>
-                                        </div>
-                                        
-                                        <div class="text-gray-700 py-2 px-3 rounded-md bg-gray-100 h-full relative lg:ml-5 ml-2 lg:mr-20  dark:bg-gray-800 dark:text-gray-100" style="width: 13%;">
-                                            <p class="leading-6"> Price: <%= post.price %></p>
                                         </div>
                                     </div>
                                 </div>   

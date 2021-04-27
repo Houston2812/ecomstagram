@@ -815,7 +815,7 @@ app.get('/feed', (req, res) => {
     if (req.session.username){
         req.session.cookie.expires = new Date(Date.now() + hour)
 
-        let sql = `SELECT id FROM users WHERE users.username="${req.session.username}";`
+        let sql = `SELECT * FROM users WHERE users.username="${req.session.username}";`
         conn.query(sql, (err0, result0) => {
             if (err0) throw err0
             if (result0[0].id){
@@ -825,9 +825,9 @@ app.get('/feed', (req, res) => {
                     if (err) throw err;
                     if (result.length > 0){
                         console.log(result);
-                        res.render('feed_final', {username: req.session.username, posts: result })
+                        res.render('feed_final', {username: result0[0], posts: result })
                     } else {
-                        res.render('feed_final', {username: req.session.username, posts: []})
+                        res.render('feed_final', {username: result0[0], posts: []})
                     }
                 })
             }
@@ -870,13 +870,36 @@ app.get('/new_friends', (req, res) => {
                                 if (result5[0].count == result4[0].count) {
                                     res.render('new_friends', {friends: []})
                                 } else {
-                                    sql = `SELECT DISTINCT users.* FROM followers, users WHERE followers.user_to != users.id AND users.username != '${req.session.username}';`
-                                    conn.query(sql, (err, result) => {
-                                        if (err) throw err;
-                                        if (result.length > 0) {
-                                            res.render('new_friends', {friends: result})            
-                                        } else {
-                                            res.render('new_friends', {friends: []})
+                                    sql = `SELECT id FROM users WHERE username = "${req.session.username}";`
+                                    conn.query(sql, (err3, result3) => {
+                                        if (err3) throw err3;
+                                        if (result3.length > 0) {
+                                            sql = `SELECT COUNT(id) as count FROM followers WHERE user_from = ${result3[0].id};`
+                                            conn.query(sql, (err6, result6) => {
+                                                if (err4)throw err4;
+                                                if (result6[0].count == 0) {
+                                                    sql = `SELECT DISTINCT users.* FROM followers, users WHERE followers.user_to != users.id AND users.username != '${req.session.username}';`
+                                                    conn.query(sql, (err, result) => {
+                                                        if (err) throw err;
+                                                        if (result.length > 0) {
+                                                            res.render('new_friends', {friends: result})            
+                                                        } else {
+                                                            res.render('new_friends', {friends: []})
+                                                        }
+                                                    })
+                                                } else {
+                                                    sql = `SELECT DISTINCT users.* FROM followers, users WHERE followers.user_to != users.id AND followers.user_from=${result3[0].id} and users.username != '${req.session.username}';`
+                                                    conn.query(sql, (err, result) => {
+                                                        if (err) throw err;
+                                                        if (result.length > 0) {
+                                                            res.render('new_friends', {friends: result})            
+                                                        } else {
+                                                            res.render('new_friends', {friends: []})
+                                                        }
+                                                    })
+                                                }
+                                            })
+                                          
                                         }
                                     })
                                 }
@@ -1016,4 +1039,3 @@ app.get('/new_connections', (req, res) => {
 app.listen(port, () => {
     console.log(`Server started at http://localhost:${port}`)
 })
-

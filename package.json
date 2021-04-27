@@ -4,7 +4,6 @@
   "description": "E-comstagram ",
   "main": "app.js",
   "dependencies": {
-    "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "connect-flash": "^0.1.1",
@@ -19,9 +18,9 @@
     "jwt-encode": "^1.0.1",
     "mysql": "^2.18.1",
     "node-pre-gyp": "^0.17.0",
+    "nodemailer": "^6.5.0",
     "nodemon": "^2.0.7",
-    "stripe": "^8.144.0",
-    "nodemailer": "^6.5.0"
+    "stripe": "^8.144.0"
   },
   "devDependencies": {},
   "scripts": {
