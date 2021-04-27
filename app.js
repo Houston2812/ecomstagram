@@ -18,7 +18,7 @@ var options = {
 	port: 3306,
 	user: 'root',
 	password: config.db_pass,
-	database: 'ecomstagram_test'
+	database: 'ecomstagram'
 };
 var sessionStore = new MySQLStore(options);
 
@@ -71,7 +71,7 @@ var conn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: config.db_pass,
-    database: 'ecomstagram_test'
+    database: 'ecomstagram'
 })
 
 const transport = nodemailer.createTransport({
