@@ -516,11 +516,18 @@ app.post('/users/new_post/', (req, res) => {
         let baseName = targetFile.name;
         let {description, price, product} = req.body
         // let pic_name_hashed = bcrypt.hashSync(moment + req.session.username, 10)
-        let uploadDir = path.join(__dirname, `public/posts/${req.session.username}`)
+        // let uploadDir = path.join(__dirname, `public/posts/${req.session.username}`)
+
+        let uploadDir = path.join(__dirname, `public/posts`)
 
         if (!fs.existsSync(uploadDir))
             fs.mkdirSync(uploadDir)
         
+        uploadDir = path.join(uploadDir, `${req.session.username}`)
+
+        if (!fs.existsSync(uploadDir))
+        fs.mkdirSync(uploadDir)
+
         uploadDir = path.join(uploadDir, targetFile.name)
         
         //console.log(`Price: ${price}\nDescription: ${description}`)
