@@ -48,7 +48,7 @@ img {
   max-width: calc(100% - 2em);
   margin: 1em auto;
   overflow: hidden;
-  width: 1000px;
+  width: 2000px;
 }
 
 table {
@@ -188,10 +188,8 @@ table tr:nth-child(2n+1) {
     </head>
     <body>
         <div class="container">
-            <h2 class="mt-3">Orders</h2>
-            <a href="/users/">
-                <button type="button" class="btn btn-primary btn-sm mt-3">Back to profile</button>
-            </a>
+            <h2 class="mt-3" style="text-align: center;">Orders</h2>
+            
             <div class="table-users">
                 <div class="header">
             <table class="table mt-4">
@@ -213,6 +211,10 @@ table tr:nth-child(2n+1) {
                 </tbody>
             </table>
             </div>
+            
         </div>
+        <a href="/users/">
+          <button type="button" class="btn btn-primary btn-sm mt-3" style="padding: 8px 12px; font-size: 20px; width: 300px; margin-left: 500px;">Back to profile</button>
+      </a>
     </body>
 </html>

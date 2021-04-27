@@ -1,48 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
-    <script src="/public/assets/js/jquery-3.3.1.min.js"></script>
-    
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- icons
+  ================================================== -->
+  <link rel="stylesheet" href="/public/assets/css/icons.css">
+  <!-- CSS 
+      ================================================== -->
+  <link rel="stylesheet" href="/public/assets/css/uikit.css">
+  <link rel="stylesheet" href="/public/assets/css/style.css">
+  <link rel="stylesheet" href="/public/assets/css/tailwind.css">
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous"> -->
+  <title>New Friends</title>
 </head>
 <body>
-    <h1>New friends</h1>
-    <a href="/feed" style="float: left;"  class="btn btn-info"> Return to feed</a>
-    <a href="/users" style="float: right;" class="btn btn-info">Go to the profile</a>
-    <table class="table table-hover" style="margin-left: 100px; margin-top: 100px; margin-right: 0px;">
-        <tbody>
-                <% friends.forEach( friend => { %>
-                <tr id="row-<%= friend.id %>">
-                    <th scope="row"><%= friend.username %> </th>
-                    <td>
-                        <button type="button" class="btn btn-secondary" id="btn-<%= friend.id %>" onclick="follow(<%= friend.id %>)">Follow</button>
-                    </td>
-                </tr>
-                <% }) %>
-        </tbody>
-    </table>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
-    <script>
-        function follow(profile_id) {
-            fetch(`http://localhost:3000/users/follow/${profile_id}`, {
-                method: 'POST'
-            })
-                .then(responce => {
-                    console.log('Responce ' + responce)
-                    return responce.json()
-                })
-                .then(data => {
-                    console.log(data)
-                    $('#row-' + profile_id).remove()
-                    // document.getElementById('btn-' + profile_id).innerHTML = 'Pending'
-                    // document.getElementById('btn-' + profile_id).onclick = null
-                })
-        }
-    </script>
-</body>
+  
+  <div class="bg-white dark:bg-gray-900 shadow-md rounded-md overflow-hidden">
 
+      <div class="bg-gray-50 dark:bg-gray-800 border-b border-gray-100 flex items-baseline justify-between py-4 px-6 dark:border-gray-800">
+          <h2 class="font-semibold text-lg">Who to follow</h2>
+          <a href="/feed"> Feed</a>
+          <a href="/users/"> Profile</a>
+          <a href="#" onClick="window.location.reload();"> Refresh</a>
+      </div>
+    
+      <div class="divide-gray-300 divide-gray-50 divide-opacity-50 divide-y px-4 dark:divide-gray-800 dark:text-gray-100">
+          
+        <% friends.forEach( friend => { %>
+            <div id="row-<%= friend.id %>" class="flex items-center justify-between py-3">
+                <div class="flex flex-1 items-center space-x-4">
+                    <a href="/users/visit/<%= friend.username %>">
+                        <!-- ADD PROFILE PICTURE HERE -->
+                        <img src="/public/profile_pics/<%= friend.profile_picture %>" class="bg-gray-200 rounded-full w-10 h-10">
+                    </a>
+                    <div class="flex flex-col">
+                        <span class="block capitalize font-semibold"> 
+                            <a href="/users/visit/<%= friend.username %>">
+                                <%= friend.username %>
+                            </a> 
+                        </span>
+                    </div>
+                </div>
+                
+                <button id="btn-<%= friend.id %>"  onclick="follow(<%= friend.id %>)" class="border border-gray-200 font-semibold px-4 py-1 rounded-full hover:bg-pink-600 hover:text-white hover:border-pink-600 dark:border-gray-800">
+                    Follow
+                </button>
+                <!-- <a href="#" class="border border-gray-200 font-semibold px-4 py-1 rounded-full hover:bg-pink-600 hover:text-white hover:border-pink-600 dark:border-gray-800"> Follow </a> -->
+          </div>
+        <% }) %>
+      
+    </div>
+
+  </div>
+
+  <script src="/public/js/like_handler.js"></script>
+
+  <script>
+      
+      (function (window, document, undefined) {
+          'use strict';
+          if (!('localStorage' in window)) return;
+          var nightMode = localStorage.getItem('gmtNightMode');
+          if (nightMode) {
+              document.documentElement.className += ' dark';
+          }
+      })(window, document);
+  
+  
+      (function (window, document, undefined) {
+  
+          'use strict';
+  
+          // Feature test
+          if (!('localStorage' in window)) return;
+  
+          // Get our newly insert toggle
+          var nightMode = document.querySelector('#night-mode');
+          if (!nightMode) return;
+  
+          // When clicked, toggle night mode on or off
+          nightMode.addEventListener('click', function (event) {
+              event.preventDefault();
+              document.documentElement.classList.toggle('dark');
+              if (document.documentElement.classList.contains('dark')) {
+                  localStorage.setItem('gmtNightMode', true);
+                  return;
+              }
+              localStorage.removeItem('gmtNightMode');
+          }, false);
+  
+      })(window, document);
+  </script>
+<!-- Scripts
+  ================================================== -->
+  <script src="/public/assets/js/tippy.all.min.js"></script>  
+  <script src="/public/assets/js/jquery-3.3.1.min.js"></script>
+  <script src="/public/assets/js/uikit.js"></script>
+  <script src="/public/assets/js/simplebar.js"></script>
+  <script src="/public/assets/js/custom.js"></script>
+  <!-- <script src="/public/unpkg.com/ionicons%405.2.3/dist/ionicons.js"></script> -->
+  <link rel="js" href="https://unpkg.com/ionicons%405.2.3/dist/ionicons.js">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+  <script>
+      function follow(profile_id) {
+          fetch(`http://localhost:3000/users/follow/${profile_id}`, {
+              method: 'POST'
+          })
+              .then(responce => {
+                  console.log('Responce ' + responce)
+                  return responce.json()
+              })
+              .then(data => {
+                  console.log(data)
+                  $('#row-' + profile_id).remove()
+                  // document.getElementById('btn-' + profile_id).innerHTML = 'Pending'
+                  // document.getElementById('btn-' + profile_id).onclick = null
+              })
+      }
+  </script>
+</body>
 </html>
